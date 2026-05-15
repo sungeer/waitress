@@ -1,0 +1,9 @@
+# 忽略所有
+*
+
+# 放行
+!CLAUDE.md
+!src/
+!docs/
+!app.py
+!worker.py

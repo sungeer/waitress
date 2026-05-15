@@ -1,0 +1,30 @@
+from pymilvus import connections, Collection
+
+from src.core.config import settings
+
+
+class _MilvusRegistry:
+
+    def __init__(self):
+        self._ready = False
+
+    def init(self):
+        connections.connect(
+            host=settings.rag_host,
+            port=settings.rag_port,
+        )
+        self._ready = True
+
+    def close(self):
+        connections.disconnect('default')
+        self._ready = False
+
+    def collection(self, name):
+        if not self._ready:
+            raise RuntimeError('milvus registry has not been initialized')
+        col = Collection(name)
+        col.load()
+        return col
+
+
+milvus_registry = _MilvusRegistry()  # milvus_registry.collection('kb_name') 获取并加载 Milvus 集合

@@ -1,0 +1,30 @@
+﻿
+pip cache purge  # 清除缓存
+
+pip freeze > requirements.txt
+pip install -r requirements.txt
+
+
+# 卸载
+pip uninstall asyncmy
+
+
+python -m pip install starlette uvicorn loguru httpx
+
+python -m pip install DBUtils aiomysql
+
+python -m pip install langchain-openai langchain-core
+
+python -m pip install langgraph pydantic openai
+
+python -m pip install pymilvus
+
+python -m pip install langgraph-checkpoint-sqlite
+
+python -m pip install PyJWT
+
+
+
+uvicorn app:app --host 0.0.0.0 --port 8000
+
+
