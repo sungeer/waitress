@@ -76,10 +76,11 @@ async def chat(request):
         chunks = []
         try:
             for chunk, metadata in graph.stream(input=input_dict, stream_mode='messages', config=config):
-                if isinstance(metadata, dict) and 'tags' in metadata and 'hidden' in metadata['tags']:
+                if isinstance(metadata, dict) and 'hidden' in metadata.get('tags', []):
                     continue
                 if isinstance(chunk, AIMessageChunk):
                     content = chunk.content
+                    # 调工具时 AIMessage 的 content 是空的
                     if not content:
                         continue
                     chunks.append(content)

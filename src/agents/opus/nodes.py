@@ -47,7 +47,7 @@ def weather_agent(state: AgentState):
         logger.warning('工具调用达到上限[3]轮，节点[weather_agent]强制结束')
         prompt = '你是天气咨询专家，请根据已有信息回答用户，信息不足请如实告知。'
         messages = [SystemMessage(prompt)] + state['messages']
-        response = llm.invoke(messages, config=settings.hidden_config)
+        response = llm.invoke(messages)
         return {'messages': [response]}
 
     # 不强制 tool_choice，由 LLM 自己判断是否需要调工具
@@ -55,7 +55,7 @@ def weather_agent(state: AgentState):
     prompt = '你是天气咨询专家，可以根据需要调用 get_weather 工具查询天气。'
     messages = [SystemMessage(prompt)] + state['messages']
     # LLM 判断是否需要工具调用
-    response = llm_with_tools.invoke(messages, config=settings.hidden_config)
+    response = llm_with_tools.invoke(messages)  # 调工具时 AIMessage 的 content 是空的
 
     # 需要调用工具
     if response.tool_calls:
@@ -93,7 +93,7 @@ def time_agent(state: AgentState):
     # 第二轮：工具结果已返回，基于结果生成回答
     prompt = '你是时间查询助手，请根据工具返回的时间信息回答用户。'
     messages = [SystemMessage(prompt)] + state['messages']
-    response = llm.invoke(messages, config=settings.hidden_config)
+    response = llm.invoke(messages)
     logger.info('固定流程：基于工具结果生成回答，节点[time_agent]调用结束')
     return {'messages': [response]}
 
@@ -107,5 +107,5 @@ def news_agent(state: AgentState):
     logger.info('in news_agent')
     prompt = '你是新闻资讯专家，请根据你的知识回答用户关于新闻的问题。'
     messages = [SystemMessage(prompt)] + state['messages']
-    response = llm_registry['common'].invoke(messages, config=settings.hidden_config)
+    response = llm_registry['common'].invoke(messages)
     return {'messages': [response]}
