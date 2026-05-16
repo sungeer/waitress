@@ -1,0 +1,29 @@
+
+
+
+完整流程：
+
+1、weather_agent 节点（nodes.py:58-63）— LLM 决定"我要调工具"
+    - llm.bind_tools([toolset.get_weather]) 告诉 LLM 有这个工具可用
+    - LLM 推理后，如果认为需要，会在 AIMessage 里附上 tool_calls
+    - if response.tool_calls: 检测到后，把这个带 tool_call 标记的消息追加到 state['messages']
+
+2、tools_condition（graph.py:32）— 路由判断
+    - LangGraph 内置函数，读取 state['messages'] 最后一条
+    - 发现有 tool_calls → 返回 'tools'
+    - 条件边把流路由到 weather_tools 节点
+
+3、ToolNode（graph.py:16）— 真正执行工具
+    - 解析 AIMessage 里的 tool_call 参数
+    - 实际调用 get_weather(...) 拿到结果
+    - 把 ToolMessage（含结果）追加到 state['messages']
+
+4、回到 weather_agent（graph.py:36）— 循环
+    - 边 weather_tools → weather_agent 把结果送回
+    - LLM 看到工具结果，可以再调工具，也可以直接回答
+
+---
+简单说：
+    if response.tool_calls 的作用是让 LLM 声明"我想调工具"
+    ToolNode + tools_condition 负责真正执行和路由
+
