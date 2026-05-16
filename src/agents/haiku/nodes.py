@@ -1,69 +1,51 @@
-from typing import Literal, TypedDict
-
 from langchain_core.messages import SystemMessage
 
 from loguru import logger
 
 from src.ai.llm_registry import llm_registry
-from src.core.config import settings
 from src.agents.haiku import toolset
 from src.agents.haiku.state import AgentState
 
 
-class MainRouter(TypedDict):
-    next: Literal['approval_agent']
-
-
-def main_node(state: AgentState):
-    """路由节点：分类用户意图，决定下一步处理节点"""
-    logger.info('in main_node')
-    prompt = """
-        你是一个意图分类专家，根据用户输入判断意图：
-        - approval_agent: 发送通知、消息等需要人工确认的操作
-        仅返回JSON：{"next":"..."}
+def order_agent(state: AgentState):
     """
-    messages = [SystemMessage(prompt)] + state['messages']
-    routing = llm_registry['common'].with_structured_output(MainRouter).invoke(
-        messages, config={'tags': ['hidden']}
-    )
-    nxt = routing['next']
-    if nxt == 'approval_agent':
-        return {'next': nxt, 'tool_rounds': 0}
-    return {'next': nxt}
+    订单处理 Agent：先查订单，金额 > ¥1000 时调用 cancel_order 触发审批。
 
-
-def approval_agent(state: AgentState):
-    """
-    发送通知：LLM 决定发送内容后，图在工具执行前暂停，等人审批。
-
-    这个节点本身是标准的 ReAct 写法，
-    人工确认的能力来自 graph 编译时的 interrupt_before=['approval_tools']。
+    查询工具（query_order）不触发审批，动作工具（cancel_order）触发审批，
+    审批能力来自 graph 编译时的 interrupt_before=['action_tools']。
     """
     llm = llm_registry['common']
     tool_rounds = state.get('tool_rounds', 0)
 
-    if tool_rounds >= 3:
-        logger.warning('工具调用达到上限[3]轮，节点[approval_agent]强制结束')
-        prompt = '你是通知助手，请根据已有信息处理用户请求。'
+    if tool_rounds >= 5:
+        logger.warning('工具调用达到上限[5]轮，节点[order_agent]强制结束')
+        prompt = '你是订单处理助手，请根据已有信息回答用户，信息不足请如实告知。'
         messages = [SystemMessage(prompt)] + state['messages']
         response = llm.invoke(messages)
-        return {'messages': [response]}
+        return {'messages': [response], 'tool_rounds': 0}
 
-    llm_with_tools = llm.bind_tools([toolset.send_notification])
-    prompt = '你是通知助手，帮用户发送通知。请先确认消息内容和接收人，然后调用 send_notification 工具。'
+    llm_with_tools = llm.bind_tools([toolset.query_order, toolset.cancel_order])
+    prompt = (
+        '你是订单处理助手，帮用户处理订单取消请求。'
+        '请先调用 query_order 查询订单信息。'
+        '如果订单金额 > ¥1000，必须调用 cancel_order 提交审批（这会在后台触发人工审批流程）。'
+        '如果订单金额 ≤ ¥1000，直接调用 cancel_order 取消即可。'
+        '取消成功后，告知用户退款预计 3 个工作日到账。'
+    )
     messages = [SystemMessage(prompt)] + state['messages']
     response = llm_with_tools.invoke(messages)
 
     if response.tool_calls:
         tc = response.tool_calls[0]
-        logger.info(
-            f'通知待审批：接收人={tc["args"].get("recipient")}，'
-            f'内容={tc["args"].get("message")}'
-        )
+        tool_name = tc['name']
+        if tool_name == 'cancel_order':
+            logger.info(
+                f'取消待审批：订单={tc["args"].get("order_id")}，'
+                f'原因={tc["args"].get("reason")}'
+            )
+        else:
+            logger.info(f'查询订单：{tc["args"].get("description")}')
         return {'messages': [response], 'tool_rounds': tool_rounds + 1}
 
-    if tool_rounds:
-        logger.info(f'已发送通知，节点[approval_agent]调用结束')
-    else:
-        logger.info('未发送通知，节点[approval_agent]调用结束')
-    return {'messages': [response]}
+    logger.info('节点[order_agent]调用结束')
+    return {'messages': [response], 'tool_rounds': 0}

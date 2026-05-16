@@ -93,7 +93,7 @@ async def chat(request):
             logger.exception('流式输出异常')
             yield serial.to_json({'error': '服务器内部错误'}) + '\n'
 
-        assistant_content = ''.join(chunks)
+        assistant_content = ''.join(chunks)  # noqa
         service.sync_insert_message(conversation_id, user_content, assistant_content)
 
     generator = iterate_in_threadpool(event_stream())

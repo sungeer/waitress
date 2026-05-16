@@ -5,22 +5,24 @@ from src.core.response import ok
 from src.core.exceptions import BadRequestError, BusinessError
 from src.core.codes import BizCode
 from src.domains.haiku import service
-from src.domains.haiku.schema import ThreadInSchema, ApprovalInSchema
+from src.domains.haiku.schema import CancelInSchema, ApprovalInSchema
 
 
-# 发起通知请求
-async def notify(request):
+# 发起订单取消请求
+async def cancel_order(request):
     data = await request.json()
     try:
-        data = ThreadInSchema.model_validate(data)
+        data = CancelInSchema.model_validate(data)
     except ValidationError:
         raise BadRequestError()
 
-    thread_id = await run_in_threadpool(service.start_notify, data.content, data.approver_id)
-    return ok({'thread_id': thread_id}, '通知请求已提交，请等待审批')
+    result = await run_in_threadpool(service.start_cancel, data.content, data.approver_id)
+    if result.get('need_approval'):
+        return ok({'thread_id': result['thread_id']}, result.get('message', ''))
+    return ok(result.get('reply'))
 
 
-# 获取待审批的通知内容
+# 获取待审批项
 async def pending(request):
     data = await request.json()
     try:
@@ -43,7 +45,7 @@ async def approve(request):
         raise BadRequestError()
 
     await run_in_threadpool(service.approve, data.thread_id, data.operator)
-    return ok(None, '审批通过，通知已发送')
+    return ok(None, '审批通过，订单已取消并触发退款')
 
 
 # 审批拒绝
@@ -54,5 +56,5 @@ async def reject(request):
     except ValidationError:
         raise BadRequestError()
 
-    await run_in_threadpool(service.reject, data.thread_id, data.operator)
-    return ok(None, '已拒绝，通知未发送')
+    await run_in_threadpool(service.reject, data.thread_id, data.operator, data.reason)
+    return ok(None, '已拒绝，结果已通知用户')

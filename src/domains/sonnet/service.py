@@ -43,7 +43,6 @@ async def insert_message(conversation_id, user_content, assistant_content):
 
 
 def sync_insert_message(conversation_id, user_content, assistant_content):
-    """同步写入，用于流式输出完成后持久化"""
     with db.begin() as cursor:
         repository.insert_message(cursor, conversation_id, 'user', user_content)
         repository.insert_message(cursor, conversation_id, 'assistant', assistant_content)

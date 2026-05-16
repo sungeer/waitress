@@ -45,6 +45,7 @@ def build_news_graph():
     builder = StateGraph(AgentState)  # type: ignore[arg-type]
 
     builder.add_node('news_agent', nodes.news_agent)  # type: ignore[arg-type]
+
     builder.add_edge(START, 'news_agent')
 
     builder.add_edge('news_agent', END)

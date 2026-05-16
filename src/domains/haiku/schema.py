@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ThreadInSchema(BaseModel):
+class CancelInSchema(BaseModel):
     content: str
     approver_id: str = ''
 
@@ -9,3 +9,4 @@ class ThreadInSchema(BaseModel):
 class ApprovalInSchema(BaseModel):
     thread_id: str
     operator: str = ''
+    reason: str = ''

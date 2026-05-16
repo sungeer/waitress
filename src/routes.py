@@ -12,7 +12,7 @@ routes = [
 
     Route('/auth.login', auth_views.login, methods=['POST']),
 
-    Route('/haiku.notify', haiku_views.notify, methods=['POST']),
+    Route('/haiku.order.cancel', haiku_views.cancel_order, methods=['POST']),
     Route('/haiku.approval.pending', haiku_views.pending, methods=['POST']),
     Route('/haiku.approval.approve', haiku_views.approve, methods=['POST']),
     Route('/haiku.approval.reject', haiku_views.reject, methods=['POST']),

@@ -37,24 +37,26 @@ def init():
         )
 
         # 审批任务表
-        # conn.execute('''
-        #     CREATE TABLE IF NOT EXISTS approval_tasks (
-        #         id          INTEGER PRIMARY KEY,
-        #         thread_id   TEXT    NOT NULL UNIQUE,
-        #         approver_id TEXT    NOT NULL DEFAULT '',
-        #         content     TEXT    NOT NULL DEFAULT '',
-        #         recipient   TEXT    NOT NULL DEFAULT '',
-        #         message     TEXT    NOT NULL DEFAULT '',
-        #         status      INTEGER NOT NULL DEFAULT 0,
-        #         operator    TEXT    NOT NULL DEFAULT '',
-        #         created_at  INTEGER NOT NULL,
-        #         updated_at  INTEGER NOT NULL
-        #     )
-        # ''')
-        # conn.execute(
-        #     'CREATE INDEX IF NOT EXISTS idx_approval_approver_status '
-        #     'ON approval_tasks(approver_id, status)'
-        # )
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS approval_tasks (
+                id            INTEGER PRIMARY KEY,
+                thread_id     TEXT    NOT NULL UNIQUE,
+                approver_id   TEXT    NOT NULL DEFAULT '',
+                content       TEXT    NOT NULL DEFAULT '',
+                order_id      TEXT    NOT NULL DEFAULT '',
+                amount        REAL    NOT NULL DEFAULT 0,
+                risk_level    INTEGER NOT NULL DEFAULT 0,
+                status        INTEGER NOT NULL DEFAULT 0,
+                operator      TEXT    NOT NULL DEFAULT '',
+                reject_reason TEXT    NOT NULL DEFAULT '',
+                created_at    INTEGER NOT NULL,
+                updated_at    INTEGER NOT NULL
+            )
+        ''')
+        conn.execute(
+            'CREATE INDEX IF NOT EXISTS idx_approval_approver_status '
+            'ON approval_tasks(approver_id, status)'
+        )
     finally:
         conn.close()
 
