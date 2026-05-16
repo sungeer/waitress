@@ -18,8 +18,6 @@ class BaseConfig:
     # 其他配置
     max_history_length = 100
 
-    hidden_config = {'tags': ['hidden']}
-
 
 class DevConfig(BaseConfig):
     is_debug = 1

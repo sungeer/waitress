@@ -24,7 +24,7 @@ def main_node(state: AgentState):
     """
     messages = [SystemMessage(prompt)] + state['messages']
     routing = llm_registry['common'].with_structured_output(MainRouter).invoke(
-        messages, config=settings.hidden_config
+        messages, config={'tags': ['hidden']}
     )
     nxt = routing['next']
     if nxt == 'approval_agent':
@@ -46,13 +46,13 @@ def approval_agent(state: AgentState):
         logger.warning('工具调用达到上限[3]轮，节点[approval_agent]强制结束')
         prompt = '你是通知助手，请根据已有信息处理用户请求。'
         messages = [SystemMessage(prompt)] + state['messages']
-        response = llm.invoke(messages, config=settings.hidden_config)
+        response = llm.invoke(messages)
         return {'messages': [response]}
 
     llm_with_tools = llm.bind_tools([toolset.send_notification])
     prompt = '你是通知助手，帮用户发送通知。请先确认消息内容和接收人，然后调用 send_notification 工具。'
     messages = [SystemMessage(prompt)] + state['messages']
-    response = llm_with_tools.invoke(messages, config=settings.hidden_config)
+    response = llm_with_tools.invoke(messages)
 
     if response.tool_calls:
         tc = response.tool_calls[0]

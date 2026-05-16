@@ -1,37 +1,9 @@
-from typing import Literal, TypedDict
-
 from loguru import logger
 from langchain_core.messages import SystemMessage
 
-from src.core.config import settings
 from src.ai.llm_registry import llm_registry
-from src.agents.opus import toolset
-from src.agents.opus.state import AgentState
-
-
-class MainRouter(TypedDict):
-    next: Literal['weather_agent', 'time_agent', 'news_agent']
-
-
-def main_node(state: AgentState):
-    """路由节点：分类用户意图，决定走向哪个处理节点"""
-    logger.info('in main_node')
-    prompt = """
-        你是一个意图分类专家，根据用户输入判断意图：
-        - weather_agent: 查询天气
-        - time_agent: 查询当前时间
-        - news_agent: 查询新闻资讯
-        仅返回JSON：{"next":"..."}
-    """
-    messages = [SystemMessage(prompt)] + state['messages']
-    routing = llm_registry['common'].with_structured_output(MainRouter).invoke(
-        messages, config={'tags': ['hidden']}
-    )
-    nxt = routing['next']
-    # 进入 weather / time 前重置工具轮次计数器
-    if nxt in ('weather_agent', 'time_agent'):
-        return {'next': nxt, 'tool_rounds': 0}
-    return {'next': nxt}
+from src.agents.sonnet import toolset
+from src.agents.sonnet.state import AgentState
 
 
 # ============================================================
@@ -48,16 +20,13 @@ def weather_agent(state: AgentState):
         prompt = '你是天气咨询专家，请根据已有信息回答用户，信息不足请如实告知。'
         messages = [SystemMessage(prompt)] + state['messages']
         response = llm.invoke(messages)
-        return {'messages': [response]}
+        return {'messages': [response], 'tool_rounds': 0}
 
-    # 不强制 tool_choice，由 LLM 自己判断是否需要调工具
     llm_with_tools = llm.bind_tools([toolset.get_weather])
     prompt = '你是天气咨询专家，可以根据需要调用 get_weather 工具查询天气。'
     messages = [SystemMessage(prompt)] + state['messages']
-    # LLM 判断是否需要工具调用
-    response = llm_with_tools.invoke(messages)  # 调工具时 AIMessage 的 content 是空的
+    response = llm_with_tools.invoke(messages)
 
-    # 需要调用工具
     if response.tool_calls:
         logger.info(f'工具调用第[{tool_rounds + 1}]轮，节点[weather_agent]')
         return {'messages': [response], 'tool_rounds': tool_rounds + 1}
@@ -66,7 +35,7 @@ def weather_agent(state: AgentState):
         logger.info(f'使用了工具[{tool_rounds}]轮，节点[weather_agent]调用结束')
     else:
         logger.info('未使用工具，节点[weather_agent]调用结束')
-    return {'messages': [response]}
+    return {'messages': [response], 'tool_rounds': 0}
 
 
 # ============================================================
@@ -82,7 +51,7 @@ def time_agent(state: AgentState):
     if tool_rounds == 0:
         llm_with_tools = llm.bind_tools(
             [toolset.get_current_time],
-            tool_choice='any'  # 强制 LLM 必须调用工具
+            tool_choice='any'
         )
         prompt = '你是时间查询助手，请调用 get_current_time 工具获取当前时间。'
         messages = [SystemMessage(prompt)] + state['messages']
@@ -95,7 +64,7 @@ def time_agent(state: AgentState):
     messages = [SystemMessage(prompt)] + state['messages']
     response = llm.invoke(messages)
     logger.info('固定流程：基于工具结果生成回答，节点[time_agent]调用结束')
-    return {'messages': [response]}
+    return {'messages': [response], 'tool_rounds': 0}
 
 
 # ============================================================
