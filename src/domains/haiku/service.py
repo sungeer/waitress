@@ -4,7 +4,7 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import AIMessage, HumanMessage
 
 from src.agents.graph_registry import graph_registry
-from src.core.db_registry import db
+from src.core import db
 
 
 def start_notify(content: str, approver_id: str) -> str:

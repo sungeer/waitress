@@ -18,8 +18,6 @@ class BaseConfig:
     # 其他配置
     max_history_length = 100
 
-    checkpoint_db = base_dir / 'data/checkpoints.db'
-
     hidden_config = {'tags': ['hidden']}
 
 
@@ -31,20 +29,13 @@ class DevConfig(BaseConfig):
     # 'openssl rand -hex 32'
     jwt_secret_key = 'cb6103ca0209a5ae546ebea25acfafd5bcebe9ffbd37cb9ad58704c53fee99c1'
 
-    db_host = '127.0.0.1'
-    db_port = 3306
-    db_user = 'jack'
-    db_passwd = 'zaq1xsw2'
-    db_name = 'waitress'
+    db_path = base_dir / 'data/data.db'
+    checkpoint_path = base_dir / 'data/checkpoints.db'
 
     # LLM 配置
-    llm_common_url = 'http://127.0.0.1:7788/v1'
-    llm_common_key = 'sk_zaq1xsw2cde'
-    llm_common_model = 'qwen3-235b-a22b'
-
-    llm_think_url = 'http://127.0.0.1:6699/v1'
-    llm_think_key = 'sk_zaq1xsw2cde'
-    llm_think_model = 'qwen3-300b-a22b'
+    llm_common_url = os.getenv('ANTHROPIC_BASE_URL')
+    llm_common_key = os.getenv('ANTHROPIC_AUTH_TOKEN')
+    llm_common_model = os.getenv('ANTHROPIC_MODEL')
 
     llm_rag_key = 'sk_zaq1xsw2cde'
     llm_rag_url = 'http://127.0.0.1:6699/v1'
@@ -61,20 +52,13 @@ class ProdConfig(BaseConfig):
 
     jwt_secret_key = 'cb6103ca0209a5ae546ebea25acfafd5bcebe9ffbd37cb9ad58704c53fee99c1'
 
-    db_host = '127.0.0.1'
-    db_port = 3306
-    db_user = 'jack'
-    db_passwd = 'zaq1xsw2'
-    db_name = 'waitress'
+    db_path = base_dir / 'data/data.db'
+    checkpoint_path = base_dir / 'data/checkpoints.db'
 
     # LLM 配置
-    llm_common_url = 'http://127.0.0.1:7788/v1'
-    llm_common_key = 'sk_zaq1xsw2cde'
-    llm_common_model = 'qwen3-235b-a22b'
-
-    llm_think_url = 'http://127.0.0.1:6699/v1'
-    llm_think_key = 'sk_zaq1xsw2cde'
-    llm_think_model = 'qwen3-300b-a22b'
+    llm_common_url = os.getenv('ANTHROPIC_BASE_URL')
+    llm_common_key = os.getenv('ANTHROPIC_AUTH_TOKEN')
+    llm_common_model = os.getenv('ANTHROPIC_MODEL')
 
     llm_rag_key = 'sk_zaq1xsw2cde'
     llm_rag_url = 'http://127.0.0.1:6699/v1'

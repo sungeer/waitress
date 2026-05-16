@@ -24,8 +24,9 @@ def build_graph():
     })
     builder.add_edge('approval_tools', 'approval_agent')
 
-    conn = sqlite3.connect(str(settings.checkpoint_db), check_same_thread=False)
+    conn = sqlite3.connect(f'{settings.checkpoint_path}', check_same_thread=False)
     checkpointer = SqliteSaver(conn)
+
     return builder.compile(
         checkpointer=checkpointer,
         interrupt_before=['approval_tools'],  # 工具执行前暂停

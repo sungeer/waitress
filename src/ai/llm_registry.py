@@ -1,6 +1,6 @@
 import httpx
 from langchain_openai import ChatOpenAI
-from openai import OpenAI
+# from openai import OpenAI
 
 from src.core.config import settings
 
@@ -22,25 +22,11 @@ class _LLMRegistry:
                 streaming=True,
                 http_client=self._client,
             ),
-            'think': ChatOpenAI(
-                model=settings.llm_think_model,
-                base_url=settings.llm_think_url,
-                api_key=settings.llm_think_key,  # noqa
-                streaming=True,
-                http_client=self._client,
-            ),
-            'coder': ChatOpenAI(
-                model=settings.llm_coder_model,
-                base_url=settings.llm_coder_url,
-                api_key=settings.llm_coder_key,  # noqa
-                streaming=True,
-                http_client=self._client,
-            ),
-            'embedding': OpenAI(
-                api_key=settings.llm_rag_key,
-                base_url=settings.llm_rag_url,
-                http_client=self._client,
-            ),
+            # 'embedding': OpenAI(
+            #     api_key=settings.llm_rag_key,
+            #     base_url=settings.llm_rag_url,
+            #     http_client=self._client,
+            # ),
         }
 
     def close(self):

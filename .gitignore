@@ -167,3 +167,5 @@ logs/*
 !logs/.gitkeep
 uploads/*
 !uploads/.gitkeep
+data/*
+!data/.gitkeep

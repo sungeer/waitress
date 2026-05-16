@@ -4,7 +4,7 @@ from src.core.config import settings
 from src.core.jwt_token import create_access_token
 from src.core.exceptions import UnauthorizedError, BusinessError
 from src.core.codes import BizCode
-from src.core.db_registry import db
+from src.core import db
 from src.core.executor import db_threadpool
 from src.domains.auth import sso_client, repository
 from src.domains.auth.sso_client import SSOError

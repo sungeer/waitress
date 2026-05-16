@@ -1,7 +1,7 @@
 from src.core.exceptions import BusinessError
 from src.core.codes import BizCode
 from src.domains.health import repository
-from src.core.db_registry import db
+from src.core import db
 from src.core.executor import db_threadpool
 from src.utils.concurrency import run_in_threadpool
 
