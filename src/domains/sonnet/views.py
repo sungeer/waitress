@@ -8,29 +8,10 @@ from langchain_core.runnables import RunnableConfig
 from src.utils import serial
 from src.core.response import ok
 from src.ai.llm_registry import llm_registry
-from src.agents.sonnet.graph import get_graph
+from src.agents.graph_registry import graph_registry
 from src.domains.sonnet import service
 from src.domains.sonnet.schema import CustomInSchema, IntentRoute
 from src.core.exceptions import BadRequestError
-
-
-def _classify(user_message: str) -> str:
-    """LLM 意图路由 — 在 graph.stream() 之前执行，输出不在流式管线内
-
-    与 opus 的 main_node 不同：这里是图外的纯函数调用，LLM 产生的 token
-    永远不会进入 event_stream，因此不需要 hidden_config。
-    """
-    prompt = """
-        你是一个意图分类专家，根据用户输入判断意图：
-        - weather: 查询天气
-        - time: 查询当前时间
-        - news: 查询新闻资讯
-        仅返回JSON：{"next":"..."}
-    """
-    messages = [SystemMessage(prompt), HumanMessage(content=user_message)]
-    llm = llm_registry['common'].with_structured_output(IntentRoute)
-    result = llm.invoke(messages)
-    return result['next']
 
 
 async def create_conversation(request):
@@ -64,10 +45,25 @@ async def chat(request):
     is_stream = data.stream
     input_dict = {'messages': history}
 
-    # ---- 图外路由：LLM 分类 → 选子图 ----
-    routing = _classify(user_content)
-    graph = get_graph(routing)
+    # ## begin 意图识别
+
+    prompt = """
+        你是一个意图分类专家，根据用户输入判断意图：
+        - weather: 查询天气
+        - time: 查询当前时间
+        - news: 查询新闻资讯
+        仅返回JSON：{"next":"..."}
+    """
+    messages = [SystemMessage(prompt), HumanMessage(content=user_content)]
+    llm = llm_registry['common'].with_structured_output(IntentRoute)
+    result = llm.invoke(messages)
+    routing = result['next']
+
     logger.info(f'LLM路由结果: [{routing}]')
+
+    # ## end 意图识别
+
+    graph = graph_registry[routing]
 
     # 非流式输出
     if not is_stream:
@@ -82,7 +78,7 @@ async def chat(request):
         await service.insert_message(conversation_id, user_content, assistant_content)
         return ok(data)
 
-    # 流式输出 — 无需 hidden 检查，路由在图外，没有内部输出需要遮蔽
+    # 流式输出
     def event_stream():
         chunks = []
         try:
