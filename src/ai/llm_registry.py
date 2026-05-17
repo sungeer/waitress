@@ -19,6 +19,15 @@ class _LLMRegistry:
                 model=settings.llm_common_model,
                 base_url=settings.llm_common_url,
                 api_key=settings.llm_common_key,  # noqa
+                extra_body={'thinking': {'type': 'disabled'}},
+                streaming=True,
+                http_client=self._client,
+            ),
+            'thinking': ChatOpenAI(
+                model=settings.llm_common_model,
+                base_url=settings.llm_common_url,
+                api_key=settings.llm_common_key,  # noqa
+                extra_body={'thinking': {'type': 'enabled'}},
                 streaming=True,
                 http_client=self._client,
             ),

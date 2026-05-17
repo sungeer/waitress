@@ -15,6 +15,9 @@ class BaseConfig:
     sso_verify_path = '/api/verify'
     sso_timeout = 10  # 秒
 
+    # 流式输出：标记中间消息的 tag，用于过滤工具调用等不应输出的 LLM 中间输出
+    stream_hidden = {'tags': ['hidden']}
+
     # 其他配置
     max_history_length = 100
 
