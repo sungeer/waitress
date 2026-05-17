@@ -42,7 +42,9 @@ async def chat(request):
         raise BadRequestError('无效的 thread_id')
 
     history = await service.get_messages(conversation_id)
+    logger.info(f'查询到的历史消息：\n{history}')
     history.append({'role': 'user', 'content': questions})
+    logger.info(f'历史消息拼接完毕：\n{history}')
 
     config = RunnableConfig(configurable={'thread_id': f'{thread_id}'})
     is_stream = data.stream
@@ -92,6 +94,7 @@ async def chat(request):
 
         data = await run_in_threadpool(sync_run_agent)
         assistant_content = data['content']
+        # 写入数据库
         await service.insert_message(conversation_id, questions, assistant_content)
         return ok(data)
 
