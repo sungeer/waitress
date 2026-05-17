@@ -5,6 +5,8 @@ from starlette.concurrency import run_in_threadpool, iterate_in_threadpool
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessageChunk
 from langchain_core.runnables import RunnableConfig
 
+from textwrap import dedent
+
 from src.utils import serial
 from src.core.response import ok
 from src.ai.llm_registry import llm_registry
@@ -47,13 +49,12 @@ async def chat(request):
 
     # ## begin 意图识别
 
-    prompt = """
+    prompt = dedent("""
         你是一个意图分类专家，根据用户输入判断意图：
         - weather: 查询天气
         - time: 查询当前时间
         - news: 查询新闻资讯
-        仅返回JSON：{"next":"..."}
-    """
+    """).strip()
     messages = [SystemMessage(prompt), HumanMessage(content=user_content)]
     llm = llm_registry['common'].with_structured_output(IntentRoute)
     result = llm.invoke(messages)
