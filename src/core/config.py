@@ -12,7 +12,10 @@ class BaseConfig:
 
     # SSO 配置
     sso_base_url = 'https://sso.company.com'
-    sso_verify_path = '/api/verify'
+    sso_app_id = 'waitress'  # 本应用在 SSO 注册的 app_id
+    sso_login_path = '/auth'  # SSO 登录页路径，拼接后: GET {sso_base_url}/auth?app_id=xxx&redirect_uri=xxx
+    sso_verify_path = '/api/verify'  # 用户名密码校验接口
+    sso_token_verify_path = '/api/token-verify'  # SSO token 换用户信息接口
     sso_timeout = 10  # 秒
 
     # 流式输出：标记中间消息的 tag，用于过滤工具调用等不应输出的 LLM 中间输出
