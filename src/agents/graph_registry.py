@@ -1,5 +1,5 @@
 from src.agents.haiku.graph import build_graph as build_haiku_graph
-from src.agents.sonnet.graph import build_weather_graph, build_news_graph, build_time_graph
+from src.agents.sonnet.graph import build_graph as build_sonnet_graph
 
 
 class _GraphRegistry:
@@ -10,9 +10,7 @@ class _GraphRegistry:
     def init(self):
         self._store = {
             'haiku': build_haiku_graph(),
-            'weather': build_weather_graph(),
-            'time': build_time_graph(),
-            'news': build_news_graph(),
+            'sonnet': build_sonnet_graph(),
         }
 
     def get(self, name):

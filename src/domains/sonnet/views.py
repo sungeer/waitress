@@ -1,17 +1,12 @@
-import json
-import textwrap
-
 from loguru import logger
 from pydantic import ValidationError
 from starlette.responses import StreamingResponse
 from starlette.concurrency import run_in_threadpool, iterate_in_threadpool
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, AIMessageChunk
+from langchain_core.messages import AIMessageChunk
 from langchain_core.runnables import RunnableConfig
 
-from src.core.config import settings
 from src.utils import serial
 from src.core.response import ok
-from src.ai.llm_registry import llm_registry
 from src.agents.graph_registry import graph_registry
 from src.domains.sonnet import service
 from src.domains.sonnet.schema import CustomInSchema
@@ -50,39 +45,7 @@ async def chat(request):
     is_stream = data.stream
     input_dict = {'messages': history}
 
-    # ## begin 意图识别
-
-    prompt = textwrap.dedent("""
-        你是一个意图分类专家，根据用户输入判断意图。仅返回JSON，不要输出其他内容：
-        {"next": "意图类型"}
-
-        意图类型有：
-        - weather: 查询天气
-        - time: 查询当前时间
-        - news: 查询新闻资讯
-
-        示例：
-        输入：今天天气怎么样  → {"next": "weather"}
-        输入：几点了          → {"next": "time"}
-        输入：有什么新闻      → {"next": "news"}
-
-        现在请根据用户输入返回JSON。
-    """).strip()
-    messages = [SystemMessage(prompt), HumanMessage(content=questions)]
-    llm = llm_registry['common']
-    result = llm.invoke(messages)
-
-    try:
-        routing = serial.from_json(result.content)['next']
-    except (Exception,):
-        logger.warning(f'LLM返回格式异常: {result.content}, 降级到[news]')
-        routing = 'news'
-
-    logger.info(f'LLM路由结果: {routing}')
-
-    # ## end 意图识别
-
-    graph = graph_registry[routing]
+    graph = graph_registry['sonnet']
 
     # 非流式输出
     if not is_stream:
