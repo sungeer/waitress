@@ -30,7 +30,7 @@ async def pending(request):
     except ValidationError:
         raise BadRequestError()
 
-    result = service.get_pending(data.thread_id)
+    result = await service.get_pending(data.thread_id)
     if result is None:
         raise BusinessError(BizCode.RESOURCE_NOT_FOUND, '无待审批项')
     return ok(result)

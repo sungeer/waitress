@@ -1,4 +1,4 @@
-def check_db_conn(conn):
-    sql = 'SELECT 1'
-    conn.execute(sql)
+def check_db_conn(cursor):
+    sql_str = 'SELECT 1'
+    cursor.execute(sql_str)
     return None

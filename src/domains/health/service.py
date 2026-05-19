@@ -8,8 +8,8 @@ from src.utils.concurrency import run_in_threadpool
 
 async def check_db_conn():
     def run_sync():
-        with db.connect() as conn:
-            repository.check_db_conn(conn)
+        with db.connect() as cursor:
+            repository.check_db_conn(cursor)
 
     await run_in_threadpool(db_threadpool, run_sync)
 

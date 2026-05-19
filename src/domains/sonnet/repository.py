@@ -1,7 +1,5 @@
 import time
 
-from src.core import db
-
 
 def create_conversation(cursor, thread_id, title):
     sql_str = '''

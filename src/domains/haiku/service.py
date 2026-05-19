@@ -7,6 +7,9 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 from src.agents.graph_registry import graph_registry
 from src.core import db
+from src.core.executor import db_threadpool
+from src.utils.concurrency import run_in_threadpool
+from src.domains.haiku import repository
 
 
 def start_cancel(content: str, approver_id: str) -> dict:
@@ -40,14 +43,8 @@ def start_cancel(content: str, approver_id: str) -> dict:
     amount = 4800.0 if order_id == 'ORD-2847' else 350.0
     risk_level = 7 if amount > 1000 else 1
 
-    with db.begin() as cur:
-        cur.execute(
-            'INSERT INTO approval_tasks '
-            '(thread_id, approver_id, content, order_id, amount, risk_level, '
-            'status, created_at, updated_at) '
-            'VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)',
-            (thread_id, approver_id, content, order_id, amount, risk_level, now, now),
-        )
+    with db.begin() as cursor:
+        repository.start_cancel(cursor, thread_id, approver_id, content, order_id, amount, risk_level)
 
     return {
         'thread_id': thread_id,
@@ -64,41 +61,31 @@ def start_cancel(content: str, approver_id: str) -> dict:
     }
 
 
-def get_pending(thread_id: str):
-    """获取待审批的订单取消信息"""
-    with db.connect() as cur:
-        cur.execute(
-            'SELECT thread_id, order_id, amount, risk_level, content, approver_id '
-            'FROM approval_tasks WHERE thread_id = ? AND status = 0',
-            (thread_id,),
-        )
-        row = cur.fetchone()
-    return row
+# 获取 待审批 的订单取消信息
+async def get_pending(thread_id: str):
+    def run_sync():
+        with db.connect() as cursor:
+            repository.get_pending(cursor, thread_id)
+
+    return await run_in_threadpool(db_threadpool, run_sync)
 
 
+# 审批通过，恢复图执行
 def approve(thread_id: str, operator: str):
-    """审批通过，恢复图执行"""
-    now = int(time.time())
-    with db.begin() as cur:
-        cur.execute(
-            'UPDATE approval_tasks SET status = 1, operator = ?, updated_at = ? '
-            'WHERE thread_id = ?',
-            (operator, now, thread_id),
-        )
+    with db.begin() as cursor:
+        repository.approve(cursor, thread_id, operator)
+
     graph = graph_registry['haiku']
     config = RunnableConfig(configurable={'thread_id': thread_id})
     graph.invoke(None, config)
+    return None
 
 
+# 审批拒绝，注入拒绝消息后恢复图执行
 def reject(thread_id: str, operator: str, reason: str):
-    """审批拒绝，注入拒绝消息后恢复图执行"""
-    now = int(time.time())
-    with db.begin() as cur:
-        cur.execute(
-            'UPDATE approval_tasks SET status = 2, operator = ?, reject_reason = ?, '
-            'updated_at = ? WHERE thread_id = ?',
-            (operator, reason, now, thread_id),
-        )
+    with db.begin() as cursor:
+        repository.reject(cursor, operator, reason, thread_id)
+
     graph = graph_registry['haiku']
     config = RunnableConfig(configurable={'thread_id': thread_id})
 
