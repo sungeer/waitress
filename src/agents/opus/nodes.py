@@ -77,11 +77,11 @@ def weather_node(state: AgentState):
         messages.append(response)
 
     # 总结归纳
-    summary_prompt = '你是天气咨询专家，根据已有信息回答用户，不要客套寒暄，采用最简洁明了的回答。'
-    summary_messages = [SystemMessage(summary_prompt)] + messages
-    summary_response = llm.invoke(summary_messages)
+    prompt = '你是天气咨询专家，根据已有信息回答用户，不要客套寒暄，采用最简洁明了的回答。'
+    messages = [SystemMessage(prompt)] + messages
+    response = llm.invoke(messages)
 
-    return {'messages': [summary_response]}
+    return {'messages': [response]}
 
 
 def time_node(state: AgentState):
@@ -110,13 +110,13 @@ def time_node(state: AgentState):
             messages.append(tool_func.invoke(tc))
 
     # 第二轮：基于工具结果生成回答
-    summary_prompt = '你是时间查询助手，请根据工具返回的时间信息回答用户。'
-    summary_messages = [SystemMessage(summary_prompt)] + messages
-    summary_response = llm.invoke(summary_messages)
+    prompt = '你是时间查询助手，请根据工具返回的时间信息回答用户。'
+    messages = [SystemMessage(prompt)] + messages
+    response = llm.invoke(messages)
 
     logger.info('固定流程：基于工具结果生成回答，节点[time_node]调用结束')
 
-    return {'messages': [summary_response]}
+    return {'messages': [response]}
 
 
 def news_node(state: AgentState):
