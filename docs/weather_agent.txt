@@ -1,5 +1,22 @@
 
 
+执行顺序是严格的两段式：
+
+  classify_node 执行完毕
+          ↓
+  第25行 条件路由判断 → 命中 'weather' → 流向 weather_node
+          ↓
+  weather_node 执行（LLM 思考，可能决定调工具）
+          ↓
+  第31行 条件路由判断 → 检查是否有 tool_call
+
+  关键点：条件边是节点执行完之后的"出口"，不是入口。第25行管的是 classify_node
+  的出口（去哪里），第31行管的是 weather_node 的出口（去 weather_tools 还是结束）。
+
+  所以 graph 里每一条边/条件边，看的都是「谁执行完了，下一步去哪」。
+
+
+
 
 完整流程：
 

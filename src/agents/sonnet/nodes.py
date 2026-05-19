@@ -40,7 +40,7 @@ def classify_node(state: AgentState):
 
     logger.info(f'LLM路由结果: {routing}')
 
-    return {'next': f'{routing}_node'}
+    return {'next': routing}
 
 
 # ============================================================
