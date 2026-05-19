@@ -52,6 +52,8 @@ def order_agent(state: AgentState):
     - 审批通过后 resume，继续调 cancel_order 执行取消
     - 金额 ≤ ¥1000 直接调 cancel_order 取消
     """
+    logger.info('in agent [order_agent]')
+
     llm = llm_registry['common']
     tool_rounds = state.get('tool_rounds', 0)
 
@@ -100,8 +102,23 @@ def order_agent(state: AgentState):
             logger.info(f'查询订单：{tc["args"].get("description")}')
         return {'messages': [response], 'tool_rounds': tool_rounds + 1}
 
-    logger.info(
-        f'实际回复的内容：{response.content}'
-        '节点[order_agent]调用结束'
-    )
+    logger.info(f'节点[order_agent]调用结束，实际回复: {response.content}')
     return {'messages': [response], 'tool_rounds': 0}
+
+
+def summarize_approval(state: AgentState):
+    """将 create_approval 的返回内容润色为自然回复"""
+    llm = llm_registry['common']
+    prompt = textwrap.dedent('''
+        你是订单处理助手。审批已提交，请根据工具返回的信息，用自然、友好的语言告知用户审批进度。
+        请直接回复用户，不要再调用任何工具。
+    ''').strip()
+    messages = [SystemMessage(prompt)] + state['messages']
+    response = llm.invoke(messages)
+    logger.info(f'审批回复: {response.content}')
+    return {'messages': [response]}
+
+
+def pause_node(state: AgentState):
+    """占位节点，仅用于 interrupt_after 中断"""
+    return {}

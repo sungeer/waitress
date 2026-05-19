@@ -41,6 +41,9 @@ def build_graph():
     builder.add_node('approval_tools', ToolNode([toolset.create_approval]))
     builder.add_node('action_tools', ToolNode([toolset.cancel_order]))
 
+    builder.add_node('summarize_approval', nodes.summarize_approval)  # type: ignore[arg-type]
+    builder.add_node('pause_node', nodes.pause_node)  # type: ignore[arg-type]
+
     # 入口
     builder.add_edge(START, 'classify_node')
 
@@ -58,7 +61,9 @@ def build_graph():
     })
 
     builder.add_edge('query_tools', 'order_agent')
-    builder.add_edge('approval_tools', 'order_agent')
+    builder.add_edge('approval_tools', 'summarize_approval')
+    builder.add_edge('summarize_approval', 'pause_node')
+    builder.add_edge('pause_node', 'order_agent')
     builder.add_edge('action_tools', 'order_agent')
 
     conn = sqlite3.connect(f'{settings.checkpoint_path}', check_same_thread=False)
@@ -66,5 +71,5 @@ def build_graph():
 
     return builder.compile(
         checkpointer=checkpointer,
-        interrupt_after=['approval_tools'],  # create_approval 执行后暂停，等人审批
+        interrupt_after=['pause_node'],  # LLM 组织回复后暂停，等人审批
     )
