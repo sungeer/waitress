@@ -96,14 +96,16 @@ def create_approval(order_id: str, reason: str, amount: float) -> str:
     approval_id = f'APR-{datetime.now().strftime("%Y%m%d")}-{now % 100000:05d}'
     risk_level = 7 if amount > 1000 else 1
 
+    sql_str = '''
+        INSERT INTO approval_tasks (
+            thread_id, approver_id, content, order_id, amount,
+            risk_level, status, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)
+    '''
+    params = (thread_id, '', reason, order_id, amount, risk_level, now, now)
+
     with db.begin() as cursor:
-        cursor.execute(
-            '''INSERT INTO approval_tasks (
-                thread_id, approver_id, content, order_id, amount,
-                risk_level, status, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)''',
-            (thread_id, '', reason, order_id, amount, risk_level, now, now),
-        )
+        cursor.execute(sql_str, params)
 
     logger.info(f'短信通知已发送：审批人，订单 [{order_id}] 取消审批待处理（编号：{approval_id}）')
 
