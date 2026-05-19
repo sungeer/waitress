@@ -27,6 +27,7 @@ def build_graph():
     builder = StateGraph(AgentState)  # type: ignore[arg-type]
 
     builder.add_node('order_agent', nodes.order_agent)  # type: ignore[arg-type]
+
     builder.add_node('query_tools', ToolNode([toolset.query_order]))
     builder.add_node('action_tools', ToolNode([toolset.cancel_order]))
 
@@ -41,6 +42,7 @@ def build_graph():
     builder.add_edge('query_tools', 'order_agent')
     builder.add_edge('action_tools', 'order_agent')
 
+    # checkpoint
     conn = sqlite3.connect(f'{settings.checkpoint_path}', check_same_thread=False)
     checkpointer = SqliteSaver(conn)
 

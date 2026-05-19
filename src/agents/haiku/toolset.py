@@ -1,3 +1,4 @@
+from loguru import logger
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 
@@ -35,6 +36,7 @@ _mock_orders = {
 @tool(args_schema=QueryOrderInput)
 def query_order(description: str) -> str:
     """根据描述查询用户最近的订单，返回订单详情（含金额、状态等）"""
+    logger.info('in tools [query_order]')
     # 模拟：根据关键词匹配
     if '昨天' in description or '最近' in description:
         order = _mock_orders['ORD-2847']
@@ -54,6 +56,7 @@ def query_order(description: str) -> str:
 @tool(args_schema=CancelOrderInput)
 def cancel_order(order_id: str, reason: str) -> str:
     """取消指定订单，并自动触发退款流程"""
+    logger.info('in tools [cancel_order]')
     order = _mock_orders.get(order_id)
     if not order:
         return f'订单 [{order_id}] 不存在，无法取消'

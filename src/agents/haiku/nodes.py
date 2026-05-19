@@ -1,6 +1,7 @@
-from langchain_core.messages import SystemMessage
+import textwrap
 
 from loguru import logger
+from langchain_core.messages import SystemMessage
 
 from src.ai.llm_registry import llm_registry
 from src.agents.haiku import toolset
@@ -25,13 +26,15 @@ def order_agent(state: AgentState):
         return {'messages': [response], 'tool_rounds': 0}
 
     llm_with_tools = llm.bind_tools([toolset.query_order, toolset.cancel_order])
-    prompt = (
-        '你是订单处理助手，帮用户处理订单取消请求。'
-        '请先调用 query_order 查询订单信息。'
-        '如果订单金额 > ¥1000，必须调用 cancel_order 提交审批（这会在后台触发人工审批流程）。'
-        '如果订单金额 ≤ ¥1000，直接调用 cancel_order 取消即可。'
-        '取消成功后，告知用户退款预计 3 个工作日到账。'
-    )
+
+    prompt = textwrap.dedent("""
+        你是订单处理助手，帮用户处理订单取消请求。
+        请先调用 query_order 查询订单信息。
+        如果订单金额 > ¥1000，必须调用 cancel_order 提交审批（这会在后台触发人工审批流程）。
+        如果订单金额 ≤ ¥1000，直接调用 cancel_order 取消即可。
+        取消成功后，告知用户退款预计 3 个工作日到账。
+    """).strip()
+
     messages = [SystemMessage(prompt)] + state['messages']
     response = llm_with_tools.invoke(messages)
 
