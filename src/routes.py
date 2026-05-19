@@ -3,6 +3,7 @@ from starlette.routing import Route
 from src.domains.health import views as health_views
 from src.domains.haiku import views as haiku_views
 from src.domains.sonnet import views as sonnet_views
+from src.domains.opus import views as opus_views
 
 routes = [
     # 健康检查
@@ -19,4 +20,8 @@ routes = [
     # 对话
     Route('/sonnet.chat', sonnet_views.chat, methods=['POST']),
     Route('/sonnet.conversation.create', sonnet_views.create_conversation, methods=['POST']),
+
+    # 对话
+    Route('/opus.chat', opus_views.chat, methods=['POST']),
+    Route('/opus.conversation.create', opus_views.create_conversation, methods=['POST']),
 ]

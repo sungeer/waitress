@@ -1,5 +1,6 @@
 from src.agents.haiku.graph import build_graph as build_haiku_graph
 from src.agents.sonnet.graph import build_graph as build_sonnet_graph
+from src.agents.opus.graph import build_graph as build_opus_graph
 
 
 class _GraphRegistry:
@@ -11,6 +12,7 @@ class _GraphRegistry:
         self._store = {
             'haiku': build_haiku_graph(),
             'sonnet': build_sonnet_graph(),
+            'opus': build_opus_graph(),
         }
 
     def get(self, name):
