@@ -1,6 +1,12 @@
+import time
+from datetime import datetime
+
 from loguru import logger
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
+from langgraph.config import get_config
+
+from src.core import db
 
 
 class QueryOrderInput(BaseModel):
@@ -10,6 +16,12 @@ class QueryOrderInput(BaseModel):
 class CancelOrderInput(BaseModel):
     order_id: str = Field(description='要取消的订单编号')
     reason: str = Field(description='取消原因')
+
+
+class CreateApprovalInput(BaseModel):
+    order_id: str = Field(description='需要审批的订单编号')
+    reason: str = Field(description='取消原因')
+    amount: float = Field(description='订单金额，从 query_order 结果中获取')
 
 
 # 模拟订单数据
@@ -37,7 +49,6 @@ _mock_orders = {
 def query_order(description: str) -> str:
     """根据描述查询用户最近的订单，返回订单详情（含金额、状态等）"""
     logger.info('in tools [query_order]')
-    # 模拟：根据关键词匹配
     if '昨天' in description or '最近' in description:
         order = _mock_orders['ORD-2847']
     else:
@@ -55,13 +66,49 @@ def query_order(description: str) -> str:
 
 @tool(args_schema=CancelOrderInput)
 def cancel_order(order_id: str, reason: str) -> str:
-    """取消指定订单，并自动触发退款流程"""
+    """直接取消指定订单并触发退款（仅限金额 ≤ ¥1000 的订单）"""
     logger.info('in tools [cancel_order]')
     order = _mock_orders.get(order_id)
     if not order:
         return f'订单 [{order_id}] 不存在，无法取消'
 
+    if order['amount'] > 1000:
+        return (
+            f'订单 [{order_id}] 金额 ¥{order["amount"]:.2f} 超过 ¥1000，'
+            f'需要人工审批，请调用 create_approval 工具提交审批'
+        )
+
     return (
         f'订单 [{order_id}] 已取消，退款 ¥{order["amount"]:.2f} 将在 3 个工作日内退回原支付账户。'
         f'取消原因：{reason}'
+    )
+
+
+@tool(args_schema=CreateApprovalInput)
+def create_approval(order_id: str, reason: str, amount: float) -> str:
+    """创建审批记录到数据库并短信通知审批人。金额 > ¥1000 的订单取消需调用此工具"""
+    logger.info('in tools [create_approval]')
+
+    config = get_config()
+    thread_id = config['configurable']['thread_id']
+
+    now = int(time.time())
+    approval_id = f'APR-{datetime.now().strftime("%Y%m%d")}-{now % 100000:05d}'
+    risk_level = 7 if amount > 1000 else 1
+
+    with db.begin() as cursor:
+        cursor.execute(
+            '''INSERT INTO approval_tasks (
+                thread_id, approver_id, content, order_id, amount,
+                risk_level, status, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)''',
+            (thread_id, '', reason, order_id, amount, risk_level, now, now),
+        )
+
+    logger.info(f'短信通知已发送：审批人，订单 [{order_id}] 取消审批待处理（编号：{approval_id}）')
+
+    return (
+        f'审批已提交（编号：{approval_id}）。'
+        f'订单 [{order_id}] 金额 ¥{amount:.2f}，取消原因：{reason}。'
+        f'已短信通知审批人，预计 24 小时内处理。审批通过后将自动取消并退款。'
     )
