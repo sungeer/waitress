@@ -5,13 +5,13 @@ BASE = 'http://127.0.0.1:8000'
 
 def test_chat():
     data = {
-        'messages': '#weather#上海天气情况。',
+        'messages': '帮我取消昨天的订单。',
         'stream': False,
         'message_id': '1779171239219',
         'is_think': False
     }
     with httpx.Client() as client:
-        resp = client.post(f'{BASE}/sonnet.chat', json=data)
+        resp = client.post(f'{BASE}/haiku.chat', json=data)
         print(f'状态码: {resp.status_code}')
         print(f'响应体: {resp.text}')
         return resp.json()

@@ -11,7 +11,7 @@ from src.agents.graph_registry import graph_registry
 from src.core.exceptions import BadRequestError, BusinessError
 from src.core.codes import BizCode
 from src.domains.haiku import service
-from src.domains.haiku.schema import CustomInSchema, CancelInSchema, ApprovalInSchema
+from src.domains.haiku.schema import CustomInSchema, ApprovalInSchema
 
 
 async def chat(request):

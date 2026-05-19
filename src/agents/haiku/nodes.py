@@ -100,5 +100,8 @@ def order_agent(state: AgentState):
             logger.info(f'查询订单：{tc["args"].get("description")}')
         return {'messages': [response], 'tool_rounds': tool_rounds + 1}
 
-    logger.info('节点[order_agent]调用结束')
+    logger.info(
+        f'实际回复的内容：{response.content}'
+        '节点[order_agent]调用结束'
+    )
     return {'messages': [response], 'tool_rounds': 0}

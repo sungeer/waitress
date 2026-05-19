@@ -32,7 +32,7 @@ def init():
             )
         ''')
         conn.execute(
-            'CREATE INDEX IF NOT EXISTS idx_messages_conversation_id '
+            'CREATE INDEX IF NOT EXISTS idx_conversation_id '
             'ON messages(conversation_id)'
         )
 
@@ -41,21 +41,15 @@ def init():
             CREATE TABLE IF NOT EXISTS approval_tasks (
                 id            INTEGER PRIMARY KEY,
                 thread_id     TEXT    NOT NULL UNIQUE,
-                approver_id   TEXT    NOT NULL DEFAULT '',
-                content       TEXT    NOT NULL DEFAULT '',
                 order_id      TEXT    NOT NULL DEFAULT '',
-                amount        REAL    NOT NULL DEFAULT 0,
-                risk_level    INTEGER NOT NULL DEFAULT 0,
                 status        INTEGER NOT NULL DEFAULT 0,
-                operator      TEXT    NOT NULL DEFAULT '',
-                reject_reason TEXT    NOT NULL DEFAULT '',
                 created_at    INTEGER NOT NULL,
                 updated_at    INTEGER NOT NULL
             )
         ''')
         conn.execute(
-            'CREATE INDEX IF NOT EXISTS idx_approval_approver_status '
-            'ON approval_tasks(approver_id, status)'
+            'CREATE INDEX IF NOT EXISTS idx_status '
+            'ON approval_tasks(status)'
         )
     finally:
         conn.close()

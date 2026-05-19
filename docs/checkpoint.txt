@@ -1,0 +1,26 @@
+
+
+迅哥，你说得对，builder.add_edge('approval_tools', 'order_agent') 定义了边的方向，但
+  interrupt_after=['approval_tools'] 让它执行完就停，不沿边走。
+
+  流程是这样的：
+
+  order_agent → route_tools → 'approval_tools'
+                                ↓
+                         approval_tools 执行 create_approval ✓
+                                ↓
+                         interrupt_after 拦截 ← 在这停了
+                                ↓ (这条边不会走)
+                         order_agent ✗
+
+  interrupt_after 在节点执行完后立刻暂停，不会继续走到 order_agent。所以 LLM 永远没机会看到
+  create_approval 的返回值，也无法帮你组织语言。
+
+  这就是根本矛盾：想要中断等人审批，又想让 LLM
+  过一手返回自然回复——interrupt_after=['approval_tools'] 做不到两全。
+
+  如果你希望 LLM 过手返回自然回复，得改成 interrupt_before=['action_tools'] 或类似的点，让 LLM
+  在审批通过后的 cancel_order 之前暂停。这样 create_approval → order_agent（LLM 组织回复）→ END
+  这条路径是通的。
+
+

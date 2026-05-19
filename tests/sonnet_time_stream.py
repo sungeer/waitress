@@ -7,7 +7,7 @@ def test_chat():
     data = {
         'messages': '#time#查询当前时间？',
         'stream': True,
-        'message_id': '1778977269578',
+        'message_id': '1779171239219',
         'is_think': False
     }
     with httpx.Client() as client:

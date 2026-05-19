@@ -11,7 +11,7 @@ routes = [
     Route('/healthz.readiness', health_views.readiness, methods=['GET']),
 
     # 审批
-    Route('/haiku.order.cancel', haiku_views.cancel_order, methods=['POST']),
+    Route('/haiku.chat', haiku_views.chat, methods=['POST']),
     Route('/haiku.approval.pending', haiku_views.pending, methods=['POST']),
     Route('/haiku.approval.approve', haiku_views.approve, methods=['POST']),
     Route('/haiku.approval.reject', haiku_views.reject, methods=['POST']),

@@ -47,19 +47,6 @@ def insert_message(cursor, conversation_id, role, content):
     cursor.execute(sql_str, (conversation_id, role, content, now))
 
 
-def start_cancel(cursor, thread_id, approver_id, content, order_id, amount, risk_level):
-    sql_str = '''
-        INSERT INTO approval_tasks (
-            thread_id, approver_id, content, order_id, amount,
-            risk_level, status, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?) 
-    '''
-    now = int(time.time())
-    params = (thread_id, approver_id, content, order_id, amount, risk_level, now, now)
-    cursor.execute(sql_str, params)
-    return None
-
-
 def get_pending(cursor, thread_id):
     sql_str = '''
         SELECT
