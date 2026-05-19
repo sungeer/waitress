@@ -47,6 +47,7 @@ _mock_orders = {
 def query_order(description: str) -> str:
     """根据描述查询用户最近的订单，返回订单详情（含金额、状态等）"""
     logger.info('in tools [query_order]')
+
     if '昨天' in description or '最近' in description:
         order = _mock_orders['ORD-2847']
     else:

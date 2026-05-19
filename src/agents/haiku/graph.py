@@ -39,7 +39,7 @@ def build_graph():
 
     builder.add_node('query_tools', ToolNode([toolset.query_order]))
     builder.add_node('approval_tools', ToolNode([toolset.create_approval]))
-    builder.add_node('action_tools', ToolNode([toolset.cancel_order]))
+    builder.add_node('action_tools', ToolNode([toolset.cancel_order]))  # 直接取消
 
     builder.add_node('summarize_approval', nodes.summarize_approval)  # type: ignore[arg-type]
     builder.add_node('pause_node', nodes.pause_node)  # type: ignore[arg-type]
@@ -55,8 +55,8 @@ def build_graph():
 
     builder.add_conditional_edges('order_agent', route_tools, {
         'query_tools': 'query_tools',
-        'approval_tools': 'approval_tools',
-        'action_tools': 'action_tools',
+        'approval_tools': 'approval_tools',  # 创建审批
+        'action_tools': 'action_tools',  # 直接取消
         END: END,
     })
 

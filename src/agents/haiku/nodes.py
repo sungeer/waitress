@@ -88,11 +88,13 @@ def order_agent(state: AgentState):
     if response.tool_calls:
         tc = response.tool_calls[0]
         tool_name = tc['name']
+        # 创建审批
         if tool_name == 'create_approval':
             logger.info(
                 f'提交审批：订单={tc["args"].get("order_id")}，'
                 f'金额={tc["args"].get("amount")}'
             )
+        # 直接取消
         elif tool_name == 'cancel_order':
             logger.info(
                 f'取消订单：订单={tc["args"].get("order_id")}，'
@@ -108,14 +110,19 @@ def order_agent(state: AgentState):
 
 def summarize_approval(state: AgentState):
     """将 create_approval 的返回内容润色为自然回复"""
-    llm = llm_registry['common']
     prompt = textwrap.dedent('''
         你是订单处理助手。审批已提交，请根据工具返回的信息，用自然、友好的语言告知用户审批进度。
         请直接回复用户，不要再调用任何工具。
     ''').strip()
+
+    llm = llm_registry['common']
+
     messages = [SystemMessage(prompt)] + state['messages']
+
     response = llm.invoke(messages)
+
     logger.info(f'审批回复: {response.content}')
+
     return {'messages': [response]}
 
 
