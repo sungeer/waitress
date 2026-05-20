@@ -1,3 +1,6 @@
+from contextlib import suppress
+
+from loguru import logger
 from pymilvus import connections, Collection
 
 from src.core.config import settings
@@ -9,14 +12,19 @@ class _MilvusRegistry:
         self._ready = False
 
     def init(self):
-        connections.connect(
-            host=settings.rag_host,
-            port=settings.rag_port,
-        )
-        self._ready = True
+        try:
+            connections.connect(
+                host=settings.rag_host,
+                port=settings.rag_port,
+            )
+        except (Exception,):
+            logger.exception('连接知识库失败')
+        else:
+            self._ready = True
 
     def close(self):
-        connections.disconnect('default')
+        with suppress(Exception):
+            connections.disconnect('default')
         self._ready = False
 
     def collection(self, name):
