@@ -70,7 +70,8 @@ def weather_node(state: AgentState):
             tool_func = tools_map.get(tc['name'])
             if tool_func is None:
                 continue
-            messages.append(tool_func.invoke(tc))
+            result = tool_func.invoke(tc)
+            messages.append(result)
     else:
         logger.warning(f'工具调用达到上限[3]轮，强制结束')
         response = llm.invoke(messages)
@@ -107,7 +108,8 @@ def time_node(state: AgentState):
             tool_func = tools_map.get(tc['name'])
             if tool_func is None:
                 continue
-            messages.append(tool_func.invoke(tc))
+            result = tool_func.invoke(tc)
+            messages.append(result)
 
     # 第二轮：基于工具结果生成回答
     prompt = '你是时间查询助手，请根据工具返回的时间信息回答用户。'

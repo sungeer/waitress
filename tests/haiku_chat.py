@@ -11,7 +11,7 @@ def test_chat():
         'is_think': False
     }
     with httpx.Client() as client:
-        resp = client.post(f'{BASE}/haiku.chat', json=data, timeout=60)
+        resp = client.post(f'{BASE}/sonnet.chat', json=data, timeout=60)
         print(f'状态码: {resp.status_code}')
         print(f'响应体: {resp.text}')
         return resp.json()
