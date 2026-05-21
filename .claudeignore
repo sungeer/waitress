@@ -1,9 +1,14 @@
-# 忽略所有
-*
+.venv/
+.idea/
 
-# 放行
-!CLAUDE.md
-!src/
-!docs/
-!app.py
-!worker.py
+logs/
+data/
+
+docs/
+
+tests/
+
+.env
+
+*.log
+*.db
