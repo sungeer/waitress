@@ -1,26 +1,30 @@
 
+场景：用户说"帮我取消昨天那个订单"
 
-迅哥，你说得对，builder.add_edge('approval_tools', 'order_agent') 定义了边的方向，但
-  interrupt_after=['approval_tools'] 让它执行完就停，不沿边走。
+[Step 1] Agent 查询订单
+ → 找到订单 ORD-2847，金额 ¥4800
+ → 风险评分：金额 > ¥1000 → 提交审批
 
-  流程是这样的：
+[Step 2] 用户收到回复
+ "您的订单取消请求已提交审批（审批编号：APR-20260430-001）。
+ 审批类型：单人审批，预计 24 小时内有结果。
+ 审批通过后将自动取消并触发退款。"
 
-  order_agent → route_tools → 'approval_tools'
-                                ↓
-                         approval_tools 执行 create_approval ✓
-                                ↓
-                         interrupt_after 拦截 ← 在这停了
-                                ↓ (这条边不会走)
-                         order_agent ✗
+[Step 3] 主管收到审批通知
+ "有一笔订单取消待审批：
+ 订单号：ORD-2847，金额：¥4800，用户：zhangsan
+ 请前往审批后台处理。"
 
-  interrupt_after 在节点执行完后立刻暂停，不会继续走到 order_agent。所以 LLM 永远没机会看到
-  create_approval 的返回值，也无法帮你组织语言。
+[Step 4a] 主管批准
+ → 系统自动执行取消 + 退款
+ → 用户收到推送："您的订单已取消，退款将在 3 个工作日到账。"
 
-  这就是根本矛盾：想要中断等人审批，又想让 LLM
-  过一手返回自然回复——interrupt_after=['approval_tools'] 做不到两全。
+[Step 4b] 主管拒绝
+ → 用户收到推送："您的订单取消请求未通过审批，原因：订单已发货。
+ 如需帮助请联系客服。"
 
-  如果你希望 LLM 过手返回自然回复，得改成 interrupt_before=['action_tools'] 或类似的点，让 LLM
-  在审批通过后的 cancel_order 之前暂停。这样 create_approval → order_agent（LLM 组织回复）→ END
-  这条路径是通的。
+[Step 4c] 24 小时无响应
+ → 审批超时关闭
+ → 用户收到推送："您的订单取消请求已超时关闭，如需继续请重新发起。"
 
 
