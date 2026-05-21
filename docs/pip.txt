@@ -9,7 +9,7 @@ pip install -r requirements.txt
 pip uninstall asyncmy
 
 
-python -m pip install starlette uvicorn loguru httpx
+python -m pip install starlette uvicorn loguru httpx cryptography
 
 python -m pip install DBUtils aiomysql
 
