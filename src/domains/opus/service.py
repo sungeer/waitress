@@ -1,13 +1,12 @@
-import time
-
-from src.core import db
+from src.core.db_registry import db
 from src.core.executor import db_threadpool
 from src.domains.opus import repository
+from src.utils import rand
 from src.utils.concurrency import run_in_threadpool
 
 
 async def create_conversation(title):
-    thread_id = str(int(time.time() * 1000))
+    thread_id = rand.gen_token()
 
     def run_sync():
         with db.begin() as cursor:

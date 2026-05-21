@@ -1,13 +1,9 @@
-import time
-
-
 def create_conversation(cursor, thread_id, title):
     sql_str = '''
         INSERT INTO conversations (thread_id, title, created_at)
-        VALUES (?, ?, ?)
+        VALUES (%s, %s, NOW())
     '''
-    now = int(time.time())
-    cursor.execute(sql_str, (thread_id, title, now))
+    cursor.execute(sql_str, (thread_id, title))
 
 
 def get_conversation(cursor, thread_id):
@@ -17,7 +13,7 @@ def get_conversation(cursor, thread_id):
         FROM
             conversations
         WHERE
-            thread_id = ?
+            thread_id = %s
     '''
     cursor.execute(sql_str, (thread_id,))
     row = cursor.fetchone()
@@ -31,7 +27,7 @@ def get_messages(cursor, conversation_id):
         FROM
             messages
         WHERE
-            conversation_id = ?
+            conversation_id = %s
         ORDER BY id
     '''
     cursor.execute(sql_str, (conversation_id,))
@@ -41,10 +37,9 @@ def get_messages(cursor, conversation_id):
 def insert_message(cursor, conversation_id, role, content):
     sql_str = '''
         INSERT INTO messages (conversation_id, role, content, created_at)
-        VALUES (?, ?, ?, ?)
+        VALUES (%s, %s, %s, NOW())
     '''
-    now = int(time.time())
-    cursor.execute(sql_str, (conversation_id, role, content, now))
+    cursor.execute(sql_str, (conversation_id, role, content))
 
 
 def get_pending(cursor, thread_id):
@@ -55,7 +50,7 @@ def get_pending(cursor, thread_id):
         FROM
             approval_tasks
         WHERE
-            thread_id = ?
+            thread_id = %s
             AND status = 0
     '''
     cursor.execute(sql_str, (thread_id,))
@@ -68,13 +63,12 @@ def approve(cursor, thread_id, operator):
             approval_tasks
         SET
             status = 1,
-            operator = ?,
-            updated_at = ?
+            operator = %s,
+            updated_at = NOW()
         WHERE
-            thread_id = ?
+            thread_id = %s
     '''
-    now = int(time.time())
-    cursor.execute(sql_str, (operator, now, thread_id))
+    cursor.execute(sql_str, (operator, thread_id))
     return None
 
 
@@ -84,12 +78,11 @@ def reject(cursor, operator, reason, thread_id):
             approval_tasks
         SET
             status = 2,
-            operator = ?,
-            reject_reason = ?,
-            updated_at = ?
+            operator = %s,
+            reject_reason = %s,
+            updated_at = NOW()
         WHERE
-            thread_id = ?
+            thread_id = %s
     '''
-    now = int(time.time())
-    cursor.execute(sql_str, (operator, reason, now, thread_id))
+    cursor.execute(sql_str, (operator, reason, thread_id))
     return None

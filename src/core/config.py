@@ -37,7 +37,14 @@ class DevConfig(BaseConfig):
     jwt_secret_key = 'cb6103ca0209a5ae546ebea25acfafd5bcebe9ffbd37cb9ad58704c53fee99c1'
 
     db_path = base_dir / 'data/data.db'
-    checkpoint_path = base_dir / 'data/checkpoints.db'
+    checkpoint_path = base_dir / 'data/chp.db'
+
+    # MySQL 配置
+    db_host = '127.0.0.1'
+    db_port = 3306
+    db_user = 'root'
+    db_passwd = ''
+    db_name = 'waitress'
 
     # LLM 配置
     llm_common_url = os.getenv('ANTHROPIC_BASE_URL')
@@ -61,6 +68,13 @@ class ProdConfig(BaseConfig):
 
     db_path = base_dir / 'data/data.db'
     checkpoint_path = base_dir / 'data/checkpoints.db'
+
+    # MySQL 配置
+    db_host = '127.0.0.1'
+    db_port = 3306
+    db_user = 'root'
+    db_passwd = ''
+    db_name = 'waitress'
 
     # LLM 配置
     llm_common_url = os.getenv('ANTHROPIC_BASE_URL')

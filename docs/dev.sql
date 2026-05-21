@@ -48,10 +48,12 @@ CREATE TABLE `users` (
     `id`            INT          NOT NULL AUTO_INCREMENT COMMENT '主键',
     `ref_id`        INT          NOT NULL                COMMENT '前端项目里的用户ID',
     `username`      VARCHAR(64)  NOT NULL                COMMENT '用户名，全局唯一',
-    `created_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP                    COMMENT '账号创建时间',
+    `display_name`  VARCHAR(64)      NULL                COMMENT '中文名',
+    `email`         VARCHAR(254)     NULL                COMMENT '邮箱地址，全局唯一',
+    `created_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP   COMMENT '账号创建时间',
     `last_login_at` DATETIME         NULL                COMMENT '最近一次登录时间',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uq_ref_id`    (`ref_id`),
+    UNIQUE KEY `uq_ref_id` (`ref_id`),
     UNIQUE KEY `uq_username` (`username`)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4

@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 from src.core.logger import setup_logger
-from src.core import db
+from src.core.db_registry import db
 from src.core.executor import db_threadpool, bio_threadpool
 from src.core.startup_state import startup_state
 from src.ai.llm_registry import llm_registry
@@ -29,6 +29,8 @@ async def lifespan(app):
     llm_registry.close()
 
     # milvus_registry.close()
+
+    db.dispose()
 
     db_threadpool.shutdown(wait=True)
     bio_threadpool.shutdown(wait=True)

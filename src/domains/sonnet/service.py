@@ -1,19 +1,16 @@
-import time
-import uuid
-from datetime import datetime
-
 from langchain_core.runnables import RunnableConfig
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage
 
 from src.agents.graph_registry import graph_registry
-from src.core import db
+from src.core.db_registry import db
+from src.utils import rand
 from src.core.executor import db_threadpool
 from src.utils.concurrency import run_in_threadpool
 from src.domains.sonnet import repository
 
 
 async def create_conversation(title):
-    thread_id = str(int(time.time() * 1000))
+    thread_id = rand.gen_token()
 
     def run_sync():
         with db.begin() as cursor:

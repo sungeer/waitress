@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 from langgraph.config import get_config
 
-from src.core import db
+from src.core.db_registry import db
 
 
 class QueryOrderInput(BaseModel):
@@ -82,15 +82,14 @@ def create_approval(order_id: str, amount: float) -> str:
     config = get_config()
     thread_id = config['configurable']['thread_id']
 
-    now = int(time.time())
-    approval_id = f'APR-{datetime.now().strftime("%Y%m%d")}-{now % 100000:05d}'
+    approval_id = f'APR-{datetime.now().strftime("%Y%m%d")}-{int(time.time()) % 100000:05d}'
 
     sql_str = '''
         INSERT INTO approval_tasks (
             thread_id, order_id, status, created_at, updated_at
-        ) VALUES (?, ?, 0, ?, ?)
+        ) VALUES (%s, %s, 0, NOW(), NOW())
     '''
-    params = (thread_id, order_id, now, now)
+    params = (thread_id, order_id)
 
     with db.begin() as cursor:
         cursor.execute(sql_str, params)
