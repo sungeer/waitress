@@ -18,8 +18,9 @@ class BaseConfig:
     sso_timeout = 10  # 秒
 
     # 服务间认证（与 前端的后端 共享） 'openssl rand -hex 32'
-    service_token = '786b96ed57229010676754c1c13c163a0fe777f3b8e8ff3569575fa5d766fb22'  # HMAC 签名密钥
-    service_token_timeout = 30  # 秒 请求有效期
+    auth_key = '299095cc-1330-11e5-b06a-a45e60bec08b'  # HMAC 签名密钥
+    auth_timeout = 3  # 秒 请求有效期
+    auth_key_name = 'X-Auth-Key'
 
     stream_hidden = {'tags': ['hidden']}
 

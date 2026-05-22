@@ -1,5 +1,6 @@
 from pydantic import ValidationError
 
+from src.config import settings
 from src.core.response import ok
 from src.core import jwt_token
 from src.domains.auth import service
@@ -8,14 +9,11 @@ from src.core.exceptions import UnauthorizedError, BadRequestError
 
 
 async def token(request):
-    signature = request.headers.get('X-Auth-Signature')
-    timestamp = request.headers.get('X-Auth-Timestamp')
-
-    if not signature or not timestamp:
+    auth_key = request.headers.get(settings.auth_key_name)
+    if not auth_key:
         raise UnauthorizedError('服务间认证信息缺失')  # 401
 
-    # HMAC 认证
-    service.verify_service_signature(signature, timestamp)
+    service.verify_auth(auth_key)
 
     # 用户信息 校验
     body = await request.json()

@@ -1,5 +1,4 @@
 import time
-import hmac
 import hashlib
 
 from src.core.db_registry import db
@@ -10,29 +9,27 @@ from src.domains.auth import repository
 from src.utils.concurrency import run_in_threadpool
 
 
-def verify_service_signature(signature: str, timestamp: str):
-    # 校验时间戳，防止重放攻击
+def verify_auth(auth_key: str):
+    sp = auth_key.split('|')
+    if len(sp) != 2:
+        raise UnauthorizedError('请求头格式错误')  # 401
+
+    encrypt, timestamp = sp
+
     try:
-        elapsed = time.time() - float(timestamp)
-        if elapsed > settings.service_token_timeout:
+        timestamp = float(timestamp)
+        limit_timestamp = time.time() - settings.auth_timeout
+        if limit_timestamp > timestamp:
             raise UnauthorizedError('请求已过期')
-        if elapsed < 0:
-            raise UnauthorizedError('时间戳异常')
-    except ValueError:
+    except (ValueError,):
         raise UnauthorizedError('时间戳格式错误')
 
-    # 用同样算法重算签名
-    expected = hmac.new(
-        settings.service_token.encode('utf-8'),
-        timestamp.encode('utf-8'),
-        hashlib.sha256,
-    ).hexdigest()
+    ha = hashlib.md5(settings.auth_key.encode('utf-8'))
+    ha.update(bytes('%s|%f' % (settings.auth_key, timestamp), encoding='utf-8'))
+    result = ha.hexdigest()
 
-    # 常量时间比对，防时序攻击
-    if not hmac.compare_digest(signature, expected):
+    if encrypt != result:
         raise UnauthorizedError('签名验证失败')
-
-    return None
 
 
 # 获取本地用户，不存在则创建
