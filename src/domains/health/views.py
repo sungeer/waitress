@@ -1,6 +1,9 @@
+from loguru import logger
+
 from src.core.response import ok, Response
 from src.domains.health import service
 from src.core.startup_state import startup_state
+from src.config import settings
 
 
 async def startup_probe(request):
@@ -13,7 +16,9 @@ async def startup_probe(request):
             {'code': 503, 'msg': 'starting', 'data': {'pending': not_ready}},
             status_code=503,
         )
-    data = {'status': 'started'}
+    environment = settings.environment
+    data = {'status': 'started', 'environment': environment}
+    logger.info(f'environment: {environment}')
     return ok(data)
 
 

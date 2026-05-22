@@ -2,7 +2,7 @@ import httpx
 from langchain_openai import ChatOpenAI
 # from openai import OpenAI
 
-from src.core.config import settings
+from src.config import settings
 
 
 class _LLMRegistry:

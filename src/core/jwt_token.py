@@ -4,7 +4,7 @@ import jwt
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from starlette.authentication import AuthenticationError
 
-from src.core.config import settings
+from src.config import settings
 
 
 # 生成 JWT Access Token

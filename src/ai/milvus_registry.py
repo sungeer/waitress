@@ -3,7 +3,7 @@ from contextlib import suppress
 from loguru import logger
 from pymilvus import connections, Collection
 
-from src.core.config import settings
+from src.config import settings
 
 
 class _MilvusRegistry:

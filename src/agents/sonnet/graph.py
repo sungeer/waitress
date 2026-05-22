@@ -3,7 +3,7 @@ import sqlite3
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.sqlite import SqliteSaver
 
-from src.core.config import settings
+from src.config import settings
 from src.agents.sonnet.state import AgentState
 from src.agents.sonnet import nodes
 

@@ -4,7 +4,7 @@ from loguru import logger
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from src.ai.llm_registry import llm_registry
-from src.core.config import settings
+from src.config import settings
 from src.utils import serial
 from src.agents.opus import toolset
 from src.agents.opus.state import AgentState

@@ -2,8 +2,8 @@ import sys
 
 from loguru import logger
 
+from src.config import settings
 from src.core.context import run_id_var
-from src.core.config import settings
 
 
 def setup_logger():
@@ -27,7 +27,7 @@ def setup_logger():
         level='INFO'
     )
 
-    if settings.is_debug:
+    if settings.environment == 'development':
         logger.add(
             sink=sys.stdout,  # 标准输出流
             format='{time:YYYY-MM-DD HH:mm:ss} - {level} - [{extra[run_id]}] {name}:{function}:{line} - {message}',

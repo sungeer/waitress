@@ -4,7 +4,7 @@ import pymysql
 from pymysql.cursors import DictCursor
 from dbutils.pooled_db import PooledDB
 
-from src.core.config import settings
+from src.config import settings
 
 
 class _DBPoolHolder:

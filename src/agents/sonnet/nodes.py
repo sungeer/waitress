@@ -4,7 +4,7 @@ from loguru import logger
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from src.ai.llm_registry import llm_registry
-from src.core.config import settings
+from src.config import settings
 
 from src.agents.sonnet import toolset
 from src.agents.sonnet.state import AgentState, IntentResult, OrderDecision

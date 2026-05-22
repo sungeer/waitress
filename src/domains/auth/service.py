@@ -3,7 +3,7 @@ import hmac
 import hashlib
 
 from src.core.db_registry import db
-from src.core.config import settings
+from src.config import settings
 from src.core.exceptions import UnauthorizedError
 from src.core.executor import db_threadpool
 from src.domains.auth import repository

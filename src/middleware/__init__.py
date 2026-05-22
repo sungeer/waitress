@@ -2,7 +2,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 
-from src.core.config import settings
+from src.config import settings
 from src.middleware import tracing
 from src.middleware import auth_backend
 
