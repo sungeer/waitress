@@ -44,6 +44,32 @@ CREATE TABLE `approval_tasks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='审批任务表';
 
 
+-- 异步任务表
+CREATE TABLE `tasks` (
+    `id`             INT           NOT NULL AUTO_INCREMENT,
+    `task_id`        CHAR(18)      NOT NULL COMMENT '任务 ID',
+    `thread_id`      CHAR(18)      NOT NULL COMMENT '会话 thread_id',
+    `status`         TINYINT       NOT NULL DEFAULT 0 COMMENT '0=pending 1=running 2=completed 3=failed',
+    `error_message`  VARCHAR(512)  NOT NULL DEFAULT '' COMMENT '失败原因',
+    `created_at`     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_task_id` (`task_id`),
+    INDEX            `idx_thread_id` (`thread_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='异步任务表';
+
+
+-- 任务结果表（存储 LLM 输出长文本）
+CREATE TABLE `task_results` (
+    `id`          INT           NOT NULL AUTO_INCREMENT,
+    `task_id`     CHAR(18)      NOT NULL COMMENT '任务 ID',
+    `content`     MEDIUMTEXT    NOT NULL COMMENT 'LLM 输出内容',
+    `created_at`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_task_id` (`task_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='任务结果表';
+
+
 CREATE TABLE `users` (
     `id`            INT          NOT NULL AUTO_INCREMENT COMMENT '主键',
     `ref_id`        INT          NOT NULL                COMMENT '前端项目里的用户ID',
