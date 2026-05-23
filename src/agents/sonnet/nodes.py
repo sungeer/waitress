@@ -1,6 +1,7 @@
 import textwrap
 
 from loguru import logger
+from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from src.ai.llm_registry import llm_registry
@@ -19,8 +20,11 @@ def classify_node(state: AgentState):
 
     questions = state['messages'][-1].content
     messages = [SystemMessage(prompt), HumanMessage(content=questions)]
-    llm = llm_registry['common']
+
+    llm: ChatOpenAI = llm_registry['common']
+
     structured_llm = llm.with_structured_output(IntentResult, method='function_calling')
+
     result = structured_llm.invoke(messages, config=settings.stream_hidden)
 
     logger.info(f'LLM路由结果: {result.next}')
