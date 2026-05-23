@@ -61,28 +61,21 @@ async def create_task(thread_id):
     return task_id
 
 
-async def run_graph_task(task_id, thread_id, conversation_id, questions, input_dict, config):
+def run_graph_task(task_id, thread_id, conversation_id, questions, input_dict, config):
     """后台任务：执行 graph，写结果，更新状态"""
     try:
-        # 状态 → running
-        await run_in_threadpool(db_threadpool, _set_status, task_id, STATUS_RUNNING)
+        _set_status(task_id, STATUS_RUNNING)
 
-        # 执行 graph（走独立线程池）
-        def invoke_graph():
-            return graph_registry['haiku'].invoke(input_dict, config)
-
-        response = await run_in_threadpool(graph_threadpool, invoke_graph)
+        response = graph_registry['haiku'].invoke(input_dict, config)
         msg = response['messages'][-1]
         content = ''.join(msg.content)
 
-        # 写结果 + 消息 + 状态 → completed
-        await run_in_threadpool(db_threadpool, _save_completed, task_id, conversation_id, questions, content)
+        _save_completed(task_id, conversation_id, questions, content)
 
-        logger.info(f'任务执行完成: task_id={task_id}')
-
-    except (Exception,) as e:
-        logger.exception(f'任务执行失败: task_id={task_id}')
-        await run_in_threadpool(db_threadpool, _set_failed, task_id, str(e))
+        logger.info(f'graph task finished: task_id={task_id}')
+    except Exception as e:
+        logger.exception(f'graph task failed: task_id={task_id}')
+        _set_failed(task_id, str(e))
 
 
 async def get_task_status(task_id):
