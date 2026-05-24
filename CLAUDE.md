@@ -31,6 +31,11 @@
 - 采用点号命名法（`/auth.token`、`/task.list`）
 - 所有路由统一使用 POST 方法
 
+# 项目规则
+- 执行 Python 命令时，始终使用虚拟环境 `.venv\Scripts\python.exe`
+- 执行 pip 命令时，始终使用虚拟环境 `.venv\Scripts\pip.exe`
+- 禁止使用裸的 `python` 或 `pip` 命令
+
 ## 环境要求
 - Python 3.13
 - MySQL 8.4.9 LTS

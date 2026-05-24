@@ -9,12 +9,12 @@ def route_by_intent(state: AgentState):
 
 
 def build_graph():
-    builder = StateGraph(AgentState)
+    builder = StateGraph(AgentState)  # type: ignore[arg-type]
 
-    builder.add_node('classify_node', nodes.classify_node)
-    builder.add_node('weather_node', nodes.weather_node)
-    builder.add_node('time_node', nodes.time_node)
-    builder.add_node('news_node', nodes.news_node)
+    builder.add_node('classify_node', nodes.classify_node)  # type: ignore[arg-type]
+    builder.add_node('weather_node', nodes.weather_node)  # type: ignore[arg-type]
+    builder.add_node('time_node', nodes.time_node)  # type: ignore[arg-type]
+    builder.add_node('news_node', nodes.news_node)  # type: ignore[arg-type]
 
     builder.add_edge(START, 'classify_node')
 

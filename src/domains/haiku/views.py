@@ -50,7 +50,7 @@ async def chat(request):
         task_id, thread_id, conversation_id, questions, input_dict, config,
     )
 
-    return ok({'task_id': task_id, 'status': 'processing'})
+    return ok(task_id)
 
 
 async def task_status(request):
