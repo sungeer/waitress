@@ -6,7 +6,6 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 from src.ai.llm_registry import llm_registry
 from src.config import settings
-from src.utils import serial
 from src.agents.haiku.state import AgentState, IntentResult
 
 
