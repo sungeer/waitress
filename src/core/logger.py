@@ -16,8 +16,8 @@ def setup_logger():
 
     logger.add(
         settings.log_path,
-        rotation='100 MB',
-        retention=5,  # 保留最近 5 个轮转文件
+        rotation='50 MB',
+        retention=10,  # 保留最近 10 个轮转文件
         format='{time:YYYY-MM-DD HH:mm:ss} - {level} - [{extra[run_id]}] {name}:{function}:{line} - {message}',
         encoding='utf-8',
         enqueue=True,
@@ -30,8 +30,8 @@ def setup_logger():
 
     logger.add(
         settings.error_log_path,
-        rotation='50 MB',
-        retention=2,
+        rotation='20 MB',
+        retention=5,
         format='{time:YYYY-MM-DD HH:mm:ss} - {level} - [{extra[run_id]}] {name}:{function}:{line} - {message}',
         encoding='utf-8',
         enqueue=True,
