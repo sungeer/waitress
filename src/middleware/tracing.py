@@ -1,26 +1,16 @@
-from starlette.datastructures import MutableHeaders
+from starlette.middleware.base import BaseHTTPMiddleware
 
-from src.core.context import run_id_var, new_run_id
+from src.core.context import new_run_id, run_id_var
 
 
-class RunIdMiddleware:
+class RunIdMiddleware(BaseHTTPMiddleware):
 
-    def __init__(self, app):
-        self.app = app
+    async def dispatch(self, request, call_next):
+        # 优先复用上游传入的 X-Request-ID
+        run_id = request.headers.get('X-Request-ID', new_run_id())
+        run_id_var.set(run_id)  # 供代码层直接取用
 
-    async def __call__(self, scope, receive, send):
-        # 跳过 lifespan 启动 关闭 事件
-        if scope['type'] in ('http', 'websocket'):
-            run_id = new_run_id()
-            run_id_var.set(run_id)  # 每个请求 统一分配 run_id
+        response = await call_next(request)
 
-            async def send_with_run_id(message):
-                # 响应开始发送
-                if message['type'] == 'http.response.start':
-                    headers = MutableHeaders(scope=message)
-                    headers.append('X-Request-ID', run_id)
-                await send(message)
-
-            await self.app(scope, receive, send_with_run_id)
-        else:
-            await self.app(scope, receive, send)
+        response.headers['X-Request-ID'] = run_id
+        return response

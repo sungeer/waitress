@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from src.core.logger import setup_logger
 from src.core.db_registry import db
-from src.core.executor import db_threadpool, bio_threadpool, graph_threadpool
+from src.core.executor import executor
 from src.core.startup_state import startup_state
 from src.ai.llm_registry import llm_registry
 from src.agents.graph_registry import graph_registry
@@ -22,6 +22,8 @@ async def lifespan(app):
 
     graph_registry.init()
 
+    executor.init()
+
     startup_state.app_started = True
 
     yield
@@ -30,8 +32,6 @@ async def lifespan(app):
 
     # milvus_registry.close()
 
-    db.dispose()
+    executor.shutdown()
 
-    db_threadpool.shutdown(wait=True)
-    bio_threadpool.shutdown(wait=True)
-    graph_threadpool.shutdown(wait=True)
+    db.dispose()

@@ -13,3 +13,5 @@ config_map = {
 config_name = os.getenv('CONFIG_NAME', default='production')
 
 settings = config_map.get(config_name)
+if settings is None:
+    raise ValueError(f'无效的 CONFIG_NAME: {config_name}')

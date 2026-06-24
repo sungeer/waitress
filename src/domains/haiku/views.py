@@ -3,7 +3,7 @@ import asyncio
 from pydantic import ValidationError
 from langchain_core.runnables import RunnableConfig
 
-from src.core.executor import graph_threadpool
+from src.core.executor import executor
 from src.core.response import ok
 from src.core.exceptions import BadRequestError
 from src.domains.haiku import service
@@ -45,7 +45,7 @@ async def chat(request):
     # 火后不管：后台线程独立执行 graph
     loop = asyncio.get_running_loop()
     loop.run_in_executor(
-        graph_threadpool,
+        executor.graph,
         service.run_graph_task,
         task_id, thread_id, conversation_id, questions, input_dict, config,
     )

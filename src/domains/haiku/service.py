@@ -1,7 +1,7 @@
 from loguru import logger
 
 from src.core.db_registry import db
-from src.core.executor import db_threadpool, graph_threadpool
+from src.core.executor import executor
 from src.agents.graph_registry import graph_registry
 from src.domains.haiku import repository
 from src.utils import rand
@@ -28,7 +28,7 @@ async def create_conversation(title):
         with db.begin() as cursor:
             repository.create_conversation(cursor, thread_id, title)
 
-    await run_in_threadpool(db_threadpool, run_sync)
+    await run_in_threadpool(executor.db, run_sync)
     return thread_id
 
 
@@ -37,7 +37,7 @@ async def get_conversation(thread_id):
         with db.connect() as cursor:
             return repository.get_conversation(cursor, thread_id)
 
-    return await run_in_threadpool(db_threadpool, run_sync)
+    return await run_in_threadpool(executor.db, run_sync)
 
 
 async def get_messages(conversation_id):
@@ -45,7 +45,7 @@ async def get_messages(conversation_id):
         with db.connect() as cursor:
             return repository.get_messages(cursor, conversation_id)
 
-    return await run_in_threadpool(db_threadpool, run_sync)
+    return await run_in_threadpool(executor.db, run_sync)
 
 
 async def create_task(thread_id):
@@ -56,7 +56,7 @@ async def create_task(thread_id):
         with db.begin() as cursor:
             repository.create_task(cursor, task_id, thread_id)
 
-    await run_in_threadpool(db_threadpool, run_sync)
+    await run_in_threadpool(executor.db, run_sync)
     logger.info(f'任务已创建: task_id={task_id}, thread_id={thread_id}')
     return task_id
 
@@ -98,7 +98,7 @@ async def get_task_status(task_id):
                 'data': result,
             }
 
-    return await run_in_threadpool(db_threadpool, run_sync)
+    return await run_in_threadpool(executor.db, run_sync)
 
 
 def _set_status(task_id, status):
