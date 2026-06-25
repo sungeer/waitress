@@ -10,6 +10,7 @@ class _MilvusRegistry:
 
     def __init__(self):
         self._ready = False
+        self._loaded_collections = set()
 
     def init(self):
         try:
@@ -28,12 +29,15 @@ class _MilvusRegistry:
         with suppress(Exception):
             connections.disconnect('default')
         self._ready = False
+        self._loaded_collections.clear()
 
     def collection(self, name):
         if not self._ready:
             raise RuntimeError('milvus registry has not been initialized')
         col = Collection(name)
-        col.load()
+        if name not in self._loaded_collections:
+            col.load()
+            self._loaded_collections.add(name)
         return col
 
 
