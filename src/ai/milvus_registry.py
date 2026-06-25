@@ -16,6 +16,8 @@ class _MilvusRegistry:
             connections.connect(
                 host=settings.rag_host,
                 port=settings.rag_port,
+                keep_alive=True,  # 自动重连守护线程
+                timeout=10
             )
         except (Exception,):
             logger.exception('连接知识库失败')
