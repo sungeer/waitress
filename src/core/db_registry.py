@@ -23,7 +23,7 @@ class _DBPoolHolder:
             maxcached=3,  # 连接归还时，池中最多保留的空闲连接数 必须 >=mincached
             blocking=False,  # 连接用尽时直接抛异常
             ping=1,  # 取连接前 ping
-            # cursorclass=DictCursor,
+            cursorclass=DictCursor,
             autocommit=False,
             host=settings.db_host,
             port=settings.db_port,
@@ -36,23 +36,6 @@ class _DBPoolHolder:
             connect_timeout=10,
         )
 
-    # LLM 专用
-    @contextmanager
-    def raw(self):
-        if self._pool is None:
-            raise RuntimeError('db pool not initialized')
-        conn = self._pool.connection()
-        cursor = None
-        try:
-            cursor = conn.cursor()
-            yield cursor
-        finally:
-            if cursor is not None:
-                with suppress(Exception):
-                    cursor.close()
-            with suppress(Exception):
-                conn.close()
-
     @contextmanager
     def connect(self):
         if self._pool is None:
@@ -60,7 +43,7 @@ class _DBPoolHolder:
         conn = self._pool.connection()
         cursor = None
         try:
-            cursor = conn.cursor(DictCursor)
+            cursor = conn.cursor()
             yield cursor
         finally:
             if cursor is not None:
@@ -77,7 +60,7 @@ class _DBPoolHolder:
         cursor = None
         try:
             conn.begin()
-            cursor = conn.cursor(DictCursor)
+            cursor = conn.cursor()
             yield cursor
             conn.commit()
         except (Exception,):
