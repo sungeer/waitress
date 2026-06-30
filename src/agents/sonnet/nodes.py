@@ -114,6 +114,21 @@ def pause_node(state: AgentState):
     return {}
 
 
+def reject_notify_node(state: AgentState):
+    """审批拒绝：生成拒绝通知给用户"""
+    reason = state.get('reject_reason', '审批未通过')
+
+    llm = llm_registry['common']
+    prompt = f'审批结果是：{reason}。请用简洁的语言告知用户审批结果，并建议联系客服。'
+    messages = [SystemMessage(prompt)] + state['messages']
+
+    response = llm.invoke(messages)
+
+    logger.info(f'审批拒绝通知已生成: {response.content[:50]}...')
+
+    return {'messages': [response]}
+
+
 def cancel_agent(state: AgentState):
     """执行取消：绑 cancel_order，内部完成工具调用并生成最终回复"""
     order_id = state.get('order_id', '')

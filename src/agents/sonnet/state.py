@@ -6,8 +6,10 @@ from langgraph.graph import MessagesState
 
 class AgentState(MessagesState):
     next: str
-    order_id: str    # 目标订单ID
-    amount: float    # 订单金额
+    order_id: str          # 目标订单ID
+    amount: float          # 订单金额
+    approval_result: str   # 审批结果: 'approved' | 'rejected'
+    reject_reason: str     # 拒绝原因（审批拒绝时由 service 注入）
 
 
 class IntentResult(BaseModel):

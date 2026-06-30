@@ -12,6 +12,11 @@ def route_after_query(state: AgentState):
     return state.get('next', 'cancel')
 
 
+def route_after_pause(state: AgentState):
+    """审批后的路由：通过 → 执行取消，拒绝 → 通知用户"""
+    return state.get('approval_result', 'approved')
+
+
 def build_graph():
     builder = StateGraph(AgentState)  # type: ignore[arg-type]
 
@@ -19,6 +24,7 @@ def build_graph():
     builder.add_node('query_agent', nodes.query_agent)  # type: ignore[arg-type]
     builder.add_node('approval_agent', nodes.approval_agent)  # type: ignore[arg-type]
     builder.add_node('pause_node', nodes.pause_node)  # type: ignore[arg-type]
+    builder.add_node('reject_notify_node', nodes.reject_notify_node)  # type: ignore[arg-type]
     builder.add_node('cancel_agent', nodes.cancel_agent)  # type: ignore[arg-type]
 
     # start
@@ -32,8 +38,14 @@ def build_graph():
     })
 
     builder.add_edge('approval_agent', 'pause_node')
-    builder.add_edge('pause_node', 'cancel_agent')
+
+    builder.add_conditional_edges('pause_node', route_after_pause, {
+        'approved': 'cancel_agent',
+        'rejected': 'reject_notify_node',
+    })
+
     builder.add_edge('cancel_agent', END)
+    builder.add_edge('reject_notify_node', END)
 
     # checkpoint
     conn = sqlite3.connect(
