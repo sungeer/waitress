@@ -65,11 +65,11 @@ def llm_chat(messages: list, tools: list | None = None) -> dict:
     return response.choices[0].message.to_dict()
 
 
-def weather_node(query: str) -> str:
+def weather_node(user_input: str) -> str:
     """天气咨询：内部 ReAct 循环，LLM 自主决定调工具，最多 3 轮。
 
     Args:
-        query: 用户输入，如 "今天深圳天气怎么样"
+        user_input: 用户输入，如 "今天深圳天气怎么样"
 
     Returns:
         LLM 的最终回答文本
@@ -80,7 +80,7 @@ def weather_node(query: str) -> str:
     )
     messages = [
         {'role': 'system', 'content': system_prompt},
-        {'role': 'user', 'content': query},
+        {'role': 'user', 'content': user_input},
     ]
 
     for i in range(3):
@@ -133,15 +133,15 @@ def weather_node(query: str) -> str:
 
 
 if __name__ == '__main__':
-    test_inputs = [
+    queries = [
         '今天深圳天气怎么样？',
         '北京呢？',
         '介绍一下你自己',
     ]
 
-    for user_input in test_inputs:
+    for query in queries:
         print(f'\n{"=" * 60}')
-        print(f'用户: {user_input}')
+        print(f'用户: {query}')
         print('-' * 60)
-        answer = weather_node(user_input)
+        answer = weather_node(query)
         print(f'助手: {answer}')
