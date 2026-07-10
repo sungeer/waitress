@@ -1,11 +1,7 @@
 import json
+
 import httpx
 from openai import OpenAI
-
-
-# ============================================================
-# 配置
-# ============================================================
 
 LLM_BASE_URL = 'http://your-proxy-host/v1'
 LLM_API_KEY = 'your-api-key'
@@ -19,11 +15,6 @@ client = OpenAI(
     http_client=http_client,
     timeout=60,
 )
-
-
-# ============================================================
-# 工具定义 — 手写 JSON Schema
-# ============================================================
 
 GET_WEATHER_TOOL = {
     'type': 'function',
@@ -46,10 +37,6 @@ GET_WEATHER_TOOL = {
 TOOLS = [GET_WEATHER_TOOL]
 
 
-# ============================================================
-# 工具函数 — 纯 Python 函数
-# ============================================================
-
 def get_weather(city: str) -> str:
     weather_data = {
         '北京': '晴，25°C，微风',
@@ -59,22 +46,12 @@ def get_weather(city: str) -> str:
     return weather_data.get(city, f'未找到[{city}]的天气数据')
 
 
-# 工具名 → 函数 映射表
 TOOLS_MAP = {
     'get_weather': get_weather,
 }
 
 
-# ============================================================
-# LLM 调用封装
-# ============================================================
-
 def llm_chat(messages: list, tools: list | None = None) -> dict:
-    """调用 LLM，返回消息 dict。
-
-    使用 extra_body 禁用 thinking 模式（DeepSeek 特性，
-    对 OpenAI 原生 API 无影响，可安全保留或删除）。
-    """
     kwargs = {
         'model': LLM_MODEL,
         'messages': messages,
@@ -88,15 +65,11 @@ def llm_chat(messages: list, tools: list | None = None) -> dict:
     return response.choices[0].message.to_dict()
 
 
-# ============================================================
-# 核心逻辑：weather_node（对标原 nodes.py 的 weather_node）
-# ============================================================
-
-def weather_node(user_input: str) -> str:
+def weather_node(query: str) -> str:
     """天气咨询：内部 ReAct 循环，LLM 自主决定调工具，最多 3 轮。
 
     Args:
-        user_input: 用户输入，如 "今天深圳天气怎么样"
+        query: 用户输入，如 "今天深圳天气怎么样"
 
     Returns:
         LLM 的最终回答文本
@@ -107,7 +80,7 @@ def weather_node(user_input: str) -> str:
     )
     messages = [
         {'role': 'system', 'content': system_prompt},
-        {'role': 'user', 'content': user_input},
+        {'role': 'user', 'content': query},
     ]
 
     for i in range(3):
@@ -158,10 +131,6 @@ def weather_node(user_input: str) -> str:
     final_msg = llm_chat(messages)
     return final_msg['content']
 
-
-# ============================================================
-# 运行示例
-# ============================================================
 
 if __name__ == '__main__':
     test_inputs = [
