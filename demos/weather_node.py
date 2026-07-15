@@ -1,7 +1,7 @@
 import json
 
 import httpx
-from openai import OpenAI
+import openai
 
 LLM_BASE_URL = 'http://your-proxy-host/v1'
 LLM_API_KEY = 'your-api-key'
@@ -9,7 +9,7 @@ LLM_MODEL = 'deepseek-v4-pro'
 
 http_client = httpx.Client(verify=False)  # 禁用 SSL 证书验证
 
-client = OpenAI(
+client = openai.OpenAI(
     base_url=LLM_BASE_URL,
     api_key=LLM_API_KEY,
     http_client=http_client,
@@ -55,8 +55,9 @@ def llm_chat(messages: list, tools: list | None = None) -> dict:
     kwargs = {
         'model': LLM_MODEL,
         'messages': messages,
-        # 禁用思考模式，加快响应速度
         'extra_body': {'thinking': {'type': 'disabled'}},
+        'temperature': 0.9,
+        'top_p': 0.7,
     }
     if tools:
         kwargs['tools'] = tools
