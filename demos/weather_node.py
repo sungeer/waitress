@@ -97,7 +97,11 @@ def weather_node(user_input: str) -> str:
         print(f'[ReAct] 工具调用第 [{i + 1}] 轮')
         for tc in tool_calls:
             func_name = tc['function']['name']
-            func_args = json.loads(tc['function']['arguments'])
+            try:
+                func_args = json.loads(tc['function']['arguments'])
+            except json.JSONDecodeError:
+                print(f'[ReAct] 工具参数解析失败，跳过: {tc["function"]["arguments"]}')
+                continue
 
             tool_func = TOOLS_MAP.get(func_name)
             if tool_func is None:
@@ -130,7 +134,7 @@ def weather_node(user_input: str) -> str:
     ] + messages
 
     final_msg = llm_chat(messages)
-    return final_msg['content']
+    return final_msg.get('content') or ''
 
 
 if __name__ == '__main__':
