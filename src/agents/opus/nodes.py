@@ -83,6 +83,7 @@ def weather_node(state: AgentState):
         SystemMessage('你是天气咨询专家，根据已有信息回答用户，不要客套寒暄，采用最简洁明了的回答。'),
     ]
     for msg in messages:
+        # AIMessage（"我需要调用 xx 工具"）
         if isinstance(msg, (HumanMessage, ToolMessage)):
             final_messages.append(msg)  # noqa
     response = llm_registry['streaming'].invoke(final_messages)
