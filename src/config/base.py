@@ -23,7 +23,5 @@ class BaseConfig:
     auth_timeout = 3  # 秒 请求有效期
     auth_key_name = 'X-Auth-Key'
 
-    stream_hidden = {'tags': ['hidden']}
-
     # 其他配置
     max_history_length = 100

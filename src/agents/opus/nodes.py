@@ -1,10 +1,9 @@
 import textwrap
 
 from loguru import logger
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 
 from src.ai.llm_registry import llm_registry
-from src.config import settings
 from src.utils import serial
 from src.agents.opus import toolset
 from src.agents.opus.state import AgentState
@@ -30,7 +29,7 @@ def classify_node(state: AgentState):
     questions = state['messages'][-1].content
     messages = [SystemMessage(prompt), HumanMessage(content=questions)]
     llm = llm_registry['common']
-    result = llm.invoke(messages, config=settings.stream_hidden)
+    result = llm.invoke(messages)
 
     try:
         routing = serial.from_json(result.content)['next']
@@ -49,8 +48,10 @@ def classify_node(state: AgentState):
 
 def weather_node(state: AgentState):
     """天气咨询：内部 ReAct 循环，LLM 自主决定调工具，最多3轮"""
+    # 中间推理用 common（不流式），最终回答用 stream（流式）
     llm = llm_registry['common']
     llm_with_tools = llm.bind_tools([toolset.get_weather])
+
     prompt = '你是天气咨询专家，可以根据需要调用 get_weather 工具查询天气。'
     messages = [SystemMessage(prompt)] + state['messages']
 
@@ -58,7 +59,7 @@ def weather_node(state: AgentState):
     tools_map = {t.name: t for t in tools}
 
     for i in range(3):
-        response = llm_with_tools.invoke(messages, config=settings.stream_hidden)
+        response = llm_with_tools.invoke(messages)
         messages.append(response)
 
         if not response.tool_calls:
@@ -77,10 +78,14 @@ def weather_node(state: AgentState):
         response = llm.invoke(messages)
         messages.append(response)
 
-    # 总结归纳
-    prompt = '你是天气咨询专家，根据已有信息回答用户，不要客套寒暄，采用最简洁明了的回答。'
-    messages = [SystemMessage(prompt)] + messages
-    response = llm.invoke(messages)
+    # 总结归纳 —— 只保留用户问题和工具结果，过滤掉中间推理噪音
+    final_messages = [
+        SystemMessage('你是天气咨询专家，根据已有信息回答用户，不要客套寒暄，采用最简洁明了的回答。'),
+    ]
+    for msg in messages:
+        if isinstance(msg, (HumanMessage, ToolMessage)):
+            final_messages.append(msg)  # noqa
+    response = llm_registry['streaming'].invoke(final_messages)
 
     return {'messages': [response]}
 
@@ -88,6 +93,7 @@ def weather_node(state: AgentState):
 def time_node(state: AgentState):
     """时间查询：内部固定流程——先强制调工具，再基于结果回答"""
     llm = llm_registry['common']
+
     prompt = '你是时间查询助手，请调用 get_current_time 工具获取当前时间。'
     messages = [SystemMessage(prompt)] + state['messages']
 
@@ -96,7 +102,7 @@ def time_node(state: AgentState):
         [toolset.get_current_time],
         tool_choice='any',
     )
-    response = llm_with_tools.invoke(messages, config=settings.stream_hidden)
+    response = llm_with_tools.invoke(messages)
     messages.append(response)
 
     tools = [toolset.get_current_time,]
@@ -111,10 +117,14 @@ def time_node(state: AgentState):
             result = tool_func.invoke(tc)
             messages.append(result)
 
-    # 第二轮：基于工具结果生成回答
-    prompt = '你是时间查询助手，请根据工具返回的时间信息回答用户。'
-    messages = [SystemMessage(prompt)] + messages
-    response = llm.invoke(messages)
+    # 第二轮：基于工具结果生成回答 —— 只保留用户问题和工具结果
+    final_messages = [
+        SystemMessage('你是时间查询助手，请根据工具返回的时间信息回答用户。'),
+    ]
+    for msg in messages:
+        if isinstance(msg, (HumanMessage, ToolMessage)):
+            final_messages.append(msg)
+    response = llm_registry['streaming'].invoke(final_messages)
 
     logger.info('固定流程：基于工具结果生成回答，节点[time_node]调用结束')
 
@@ -127,6 +137,6 @@ def news_node(state: AgentState):
 
     prompt = '你是新闻资讯专家，请根据你的知识回答用户关于新闻的问题。'
     messages = [SystemMessage(prompt)] + state['messages']
-    response = llm_registry['common'].invoke(messages)
+    response = llm_registry['streaming'].invoke(messages)
 
     return {'messages': [response]}

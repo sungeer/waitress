@@ -2,11 +2,9 @@ import textwrap
 
 from loguru import logger
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 
 from src.ai.llm_registry import llm_registry
-from src.config import settings
-
 from src.agents.sonnet import toolset
 from src.agents.sonnet.state import AgentState, IntentResult, OrderDecision
 
@@ -25,7 +23,7 @@ def classify_node(state: AgentState):
 
     structured_llm = llm.with_structured_output(IntentResult, method='function_calling')
 
-    result = structured_llm.invoke(messages, config=settings.stream_hidden)
+    result = structured_llm.invoke(messages)
 
     logger.info(f'LLM路由结果: {result.next}')
 
@@ -42,7 +40,7 @@ def query_agent(state: AgentState):
     prompt = '请调用 query_order 工具查询用户订单信息。'
     messages = [SystemMessage(prompt)] + state['messages']
 
-    response = llm_with_tools.invoke(messages, config=settings.stream_hidden)
+    response = llm_with_tools.invoke(messages)
     messages.append(response)
 
     if response.tool_calls:
@@ -51,11 +49,15 @@ def query_agent(state: AgentState):
                 result = toolset.query_order.invoke(tc)
                 messages.append(result)
 
-    # 仅查询：直接生成回复
+    # 仅查询：直接生成回复 —— 只保留用户问题和工具结果
     if next_val == 'query_order':
-        summary_prompt = '请根据查询结果简洁回答用户。'
-        messages = [SystemMessage(summary_prompt)] + messages
-        response = llm.invoke(messages)
+        final_messages = [
+            SystemMessage('请根据查询结果简洁回答用户。'),
+        ]
+        for msg in messages:
+            if isinstance(msg, (HumanMessage, ToolMessage)):
+                final_messages.append(msg)
+        response = llm_registry['streaming'].invoke(final_messages)
         return {'messages': [response], 'next': 'end'}
 
     # 取消订单流程：让 LLM 根据查询结果决定下一步
@@ -67,7 +69,7 @@ def query_agent(state: AgentState):
 
     messages = [SystemMessage(decision_prompt)] + messages
     structured_llm = llm.with_structured_output(OrderDecision, method='function_calling')
-    decision = structured_llm.invoke(messages, config=settings.stream_hidden)
+    decision = structured_llm.invoke(messages)
 
     logger.info(f'查询后决策: {decision}')
 
@@ -91,7 +93,7 @@ def approval_agent(state: AgentState):
 
     messages = [SystemMessage(prompt)] + state['messages']
 
-    response = llm_with_tools.invoke(messages, config=settings.stream_hidden)
+    response = llm_with_tools.invoke(messages)
     messages.append(response)
 
     if response.tool_calls:
@@ -101,10 +103,14 @@ def approval_agent(state: AgentState):
                 messages.append(result)
                 logger.info(f'审批已提交: 订单={tc["args"].get("order_id")}')
 
-    # 生成"等待审批"回复
-    summary_prompt = '审批已提交。请用最简洁明了的语言告知用户审批进度，预计24小时内处理。'
-    messages = [SystemMessage(summary_prompt)] + messages
-    response = llm.invoke(messages)
+    # 生成"等待审批"回复 —— 只保留用户问题和工具结果
+    final_messages = [
+        SystemMessage('审批已提交。请用最简洁明了的语言告知用户审批进度，预计24小时内处理。'),
+    ]
+    for msg in messages:
+        if isinstance(msg, (HumanMessage, ToolMessage)):
+            final_messages.append(msg)
+    response = llm_registry['streaming'].invoke(final_messages)
 
     return {'messages': [response]}
 
@@ -118,11 +124,10 @@ def reject_notify_node(state: AgentState):
     """审批拒绝：生成拒绝通知给用户"""
     reason = state.get('reject_reason', '审批未通过')
 
-    llm = llm_registry['common']
     prompt = f'审批结果是：{reason}。请用简洁的语言告知用户审批结果，并建议联系客服。'
     messages = [SystemMessage(prompt)] + state['messages']
 
-    response = llm.invoke(messages)
+    response = llm_registry['streaming'].invoke(messages)
 
     logger.info(f'审批拒绝通知已生成: {response.content[:50]}...')
 
@@ -139,7 +144,7 @@ def cancel_agent(state: AgentState):
     prompt = f'请调用 cancel_order 工具取消订单 {order_id}，然后告知用户结果。'
     messages = [SystemMessage(prompt)] + state['messages']
 
-    response = llm_with_tools.invoke(messages, config=settings.stream_hidden)
+    response = llm_with_tools.invoke(messages)
     messages.append(response)
 
     if response.tool_calls:
@@ -149,9 +154,13 @@ def cancel_agent(state: AgentState):
                 messages.append(result)
                 logger.info(f'订单已取消: {tc["args"].get("order_id")}')
 
-    # 生成最终回复
-    summary_prompt = '请根据取消订单的结果，用自然语言告知用户。'
-    messages = [SystemMessage(summary_prompt)] + messages
-    response = llm.invoke(messages)
+    # 生成最终回复 —— 只保留用户问题和工具结果
+    final_messages = [
+        SystemMessage('请根据取消订单的结果，用自然语言告知用户。'),
+    ]
+    for msg in messages:
+        if isinstance(msg, (HumanMessage, ToolMessage)):
+            final_messages.append(msg)
+    response = llm_registry['streaming'].invoke(final_messages)
 
     return {'messages': [response]}

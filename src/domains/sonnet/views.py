@@ -58,9 +58,6 @@ async def chat(request):
         chunks = []
         try:
             for chunk, metadata in graph.stream(input=input_dict, stream_mode='messages', config=config):
-                if isinstance(metadata, dict):
-                    if 'hidden' in metadata.get('tags', []):
-                        continue
                 if isinstance(chunk, AIMessageChunk):
                     content = chunk.content
                     if not content:

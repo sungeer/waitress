@@ -20,6 +20,18 @@ class _LLMRegistry:
                 base_url=settings.llm_common_url,
                 api_key=settings.llm_common_key,  # noqa
                 extra_body={'thinking': {'type': 'disabled'}},
+                temperature=0.0,
+                timeout=120,
+                streaming=False,
+                http_client=self._client,
+            ),
+            'streaming': ChatOpenAI(
+                model=settings.llm_common_model,
+                base_url=settings.llm_common_url,
+                api_key=settings.llm_common_key,  # noqa
+                extra_body={'thinking': {'type': 'disabled'}},
+                temperature=0.0,
+                timeout=120,
                 streaming=True,
                 http_client=self._client,
             ),
@@ -28,6 +40,8 @@ class _LLMRegistry:
                 base_url=settings.llm_common_url,
                 api_key=settings.llm_common_key,  # noqa
                 extra_body={'thinking': {'type': 'enabled'}},
+                temperature=0.0,
+                timeout=120,
                 streaming=True,
                 http_client=self._client,
             ),
