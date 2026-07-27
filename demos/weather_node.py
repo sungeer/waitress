@@ -123,17 +123,20 @@ def weather_node(user_input: str) -> str:
         response_msg = llm_chat(messages)
         messages.append(response_msg)
 
-    # 第二阶段：总结归纳
+    # 第二阶段：总结归纳 —— 只保留用户问题和工具结果，过滤掉中间推理噪音
     print('[ReAct] 开始总结归纳...')
     summary_prompt = (
         '你是天气咨询专家，根据已有信息回答用户，'
         '不要客套寒暄，采用最简洁明了的回答。'
     )
-    messages = [
+    final_messages = [
         {'role': 'system', 'content': summary_prompt},
-    ] + messages
+    ]
+    for msg in messages:
+        if msg.get('role') in ('user', 'tool'):
+            final_messages.append(msg)
 
-    final_msg = llm_chat(messages)
+    final_msg = llm_chat(final_messages)
     return final_msg.get('content') or ''
 
 
