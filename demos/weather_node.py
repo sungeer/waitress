@@ -56,8 +56,7 @@ def llm_chat(messages: list, tools: list | None = None) -> dict:
         'model': LLM_MODEL,
         'messages': messages,
         'extra_body': {'thinking': {'type': 'disabled'}},
-        'temperature': 0.9,
-        'top_p': 0.7,
+        'temperature': 0.0,
     }
     if tools:
         kwargs['tools'] = tools
