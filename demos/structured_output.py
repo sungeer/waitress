@@ -47,6 +47,7 @@ def llm_parse(messages: list, response_format):
         model=LLM_MODEL,
         messages=messages,
         response_format=response_format,  # OrderInfo
+        temperature=0.0,
         extra_body={'thinking': {'type': 'disabled'}},
     )
     parsed = response.choices[0].message.parsed  # OrderInfo | None
