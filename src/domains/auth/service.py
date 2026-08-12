@@ -4,7 +4,7 @@ import hashlib
 from src.core.db_registry import db
 from src.config import settings
 from src.core.exceptions import UnauthorizedError
-from src.core.executor import db_threadpool
+from src.core.executor import executor
 from src.domains.auth import repository
 from src.utils.concurrency import run_in_threadpool
 
@@ -44,4 +44,4 @@ async def get_or_create_user(ref_id: int, username: str, display_name: str, emai
             new_id = repository.create_user(cursor, ref_id, username, display_name, email)
             return repository.get_user_by_id(cursor, new_id)
 
-    return await run_in_threadpool(db_threadpool, run_sync)
+    return await run_in_threadpool(executor.db, run_sync)
