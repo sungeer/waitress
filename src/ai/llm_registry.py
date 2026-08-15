@@ -1,6 +1,5 @@
 import httpx
 from langchain_openai import ChatOpenAI
-# from openai import OpenAI
 
 from src.config import settings
 
@@ -45,11 +44,6 @@ class _LLMRegistry:
                 streaming=True,
                 http_client=self._client,
             ),
-            # 'embedding': OpenAI(
-            #     api_key=settings.llm_rag_key,
-            #     base_url=settings.llm_rag_url,
-            #     http_client=self._client,
-            # ),
         }
 
     def close(self):
