@@ -20,6 +20,6 @@ class TestingConfig(BaseConfig):
     db_name = 'viper'
 
     # LLM 配置
-    llm_common_url = os.getenv('ANTHROPIC_BASE_URL')
-    llm_common_key = os.getenv('ANTHROPIC_AUTH_TOKEN')
-    llm_common_model = os.getenv('ANTHROPIC_MODEL')
+    llm_url = os.getenv('ANTHROPIC_BASE_URL')
+    llm_key = os.getenv('ANTHROPIC_AUTH_TOKEN')
+    llm_model = os.getenv('ANTHROPIC_MODEL')

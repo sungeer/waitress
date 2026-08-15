@@ -15,9 +15,9 @@ class _LLMRegistry:
 
         self._store = {
             'common': ChatOpenAI(
-                model=settings.llm_common_model,
-                base_url=settings.llm_common_url,
-                api_key=settings.llm_common_key,  # noqa
+                model=settings.llm_model,
+                base_url=settings.llm_url,
+                api_key=settings.llm_key,  # noqa
                 extra_body={
                     'thinking': {'type': 'disabled'}
                 },
@@ -28,9 +28,9 @@ class _LLMRegistry:
                 http_socket_options=(),  # 关闭 TCP Keep-Alive 的自定义配置
             ),
             'streaming': ChatOpenAI(
-                model=settings.llm_common_model,
-                base_url=settings.llm_common_url,
-                api_key=settings.llm_common_key,  # noqa
+                model=settings.llm_model,
+                base_url=settings.llm_url,
+                api_key=settings.llm_key,  # noqa
                 extra_body={
                     'thinking': {'type': 'disabled'}
                 },
@@ -41,9 +41,9 @@ class _LLMRegistry:
                 http_socket_options=(),  # 关闭 TCP Keep-Alive 的自定义配置
             ),
             'thinking': ChatOpenAI(
-                model=settings.llm_common_model,
-                base_url=settings.llm_common_url,
-                api_key=settings.llm_common_key,  # noqa
+                model=settings.llm_model,
+                base_url=settings.llm_url,
+                api_key=settings.llm_key,  # noqa
                 extra_body={
                     'thinking': {'type': 'enabled'}
                 },

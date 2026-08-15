@@ -17,10 +17,6 @@ python -m pip install langchain-openai
 
 python -m pip install langgraph
 
-python -m pip install pymilvus
-
-python -m pip install langgraph-checkpoint-sqlite
-
 
 
 
