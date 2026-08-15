@@ -26,7 +26,7 @@ def classify_node(state: AgentState):
 
     llm: ChatOpenAI = llm_registry['common']
 
-    structured_llm = llm.with_structured_output(IntentResult, method='function_calling')
+    structured_llm = llm.with_structured_output(IntentResult)
 
     result = structured_llm.invoke(messages)
 
