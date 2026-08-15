@@ -31,7 +31,8 @@ routes = [
     Route('/haiku.conversation.create', haiku_views.create_conversation, methods=['POST']),
     Route('/haiku.task.status', haiku_views.task_status, methods=['POST']),
 
-    # 任务执行器（两种后台任务模式演示）
+    # 任务执行器（三种后台任务模式演示）
     Route('/tasks.submit.async', tasks_views.submit_async, methods=['POST']),
+    Route('/tasks.submit.async_blocking', tasks_views.submit_async_blocking, methods=['POST']),
     Route('/tasks.submit.sync', tasks_views.submit_sync, methods=['POST']),
 ]
