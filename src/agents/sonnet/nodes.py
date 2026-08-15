@@ -4,7 +4,7 @@ from loguru import logger
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 
-from src.ai.llm_registry import llm_registry
+from src.core.llm_registry import llm_registry
 from src.agents.sonnet import toolset
 from src.agents.sonnet.state import AgentState, IntentResult, OrderDecision
 

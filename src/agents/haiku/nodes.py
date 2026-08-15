@@ -3,7 +3,7 @@ import textwrap
 from loguru import logger
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
-from src.ai.llm_registry import llm_registry
+from src.core.llm_registry import llm_registry
 from src.agents.haiku.state import AgentState, IntentResult
 
 

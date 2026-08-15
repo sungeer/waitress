@@ -3,7 +3,7 @@ import textwrap
 from loguru import logger
 from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 
-from src.ai.llm_registry import llm_registry
+from src.core.llm_registry import llm_registry
 from src.utils import serial
 from src.agents.opus import toolset
 from src.agents.opus.state import AgentState
