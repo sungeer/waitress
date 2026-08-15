@@ -23,10 +23,3 @@ class ProductionConfig(BaseConfig):
     llm_common_url = os.getenv('ANTHROPIC_BASE_URL')
     llm_common_key = os.getenv('ANTHROPIC_AUTH_TOKEN')
     llm_common_model = os.getenv('ANTHROPIC_MODEL')
-
-    llm_rag_key = 'sk_zaq1xsw2cde'
-    llm_rag_url = 'http://127.0.0.1:6699/v1'
-
-    rag_host = '127.0.0.1'
-    rag_port = 9903
-    rag_model = 'bge-m3'
