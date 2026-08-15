@@ -5,6 +5,7 @@ from src.domains.haiku import views as haiku_views
 from src.domains.health import views as health_views
 from src.domains.opus import views as opus_views
 from src.domains.sonnet import views as sonnet_views
+from src.domains.tasks import views as tasks_views
 
 routes = [
     # 健康检查
@@ -29,4 +30,8 @@ routes = [
     Route('/haiku.chat', haiku_views.chat, methods=['POST']),
     Route('/haiku.conversation.create', haiku_views.create_conversation, methods=['POST']),
     Route('/haiku.task.status', haiku_views.task_status, methods=['POST']),
+
+    # 任务执行器（两种后台任务模式演示）
+    Route('/tasks.submit.async', tasks_views.submit_async, methods=['POST']),
+    Route('/tasks.submit.sync', tasks_views.submit_sync, methods=['POST']),
 ]
