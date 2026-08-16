@@ -5,7 +5,7 @@ from loguru import logger
 
 
 async def blocking_caller(task_id):
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
     logger.info(f'this is blocking_caller [{task_id}]')
 
 

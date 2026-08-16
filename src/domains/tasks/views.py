@@ -82,3 +82,8 @@ def submit_sync(request):
     )
 
     return ok(task_id)
+
+
+# 后台任务观测
+async def background_count(request):
+    return ok({'count': background.count})
