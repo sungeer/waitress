@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+from src.core.background import background
 from src.core.logger import setup_logger
 from src.core.db_registry import db
 from src.core.executor import executor
@@ -20,6 +21,9 @@ async def lifespan(app):
     executor.init()
 
     yield
+
+    # 先取消在途后台任务，再关闭它们依赖的资源
+    await background.shutdown()
 
     llm_registry.close()
 
