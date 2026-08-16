@@ -5,6 +5,7 @@ import anyio
 from loguru import logger
 from pydantic import ValidationError
 
+from src.core.background import spawn
 from src.core.response import ok
 from src.core.executor import executor
 from src.core.exceptions import BadRequestError
@@ -26,9 +27,7 @@ async def submit_async(request):
 
     task_id = params.task_id
 
-    asyncio.create_task(
-        service.blocking_caller(task_id)
-    )
+    spawn(service.blocking_caller(task_id))
 
     return ok(task_id)
 
