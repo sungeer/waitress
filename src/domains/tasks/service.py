@@ -5,8 +5,11 @@ from loguru import logger
 
 
 async def blocking_caller(task_id):
-    await asyncio.sleep(5)
-    logger.info(f'this is blocking_caller [{task_id}]')
+    try:
+        await asyncio.sleep(5)
+        logger.info(f'this is blocking_caller [{task_id}]')
+    except Exception:
+        logger.exception(f'error in blocking_caller [{task_id}]')
 
 
 def sync_blocking(task_id):
