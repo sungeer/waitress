@@ -73,8 +73,8 @@ def submit_sync(request):
 
     task_id = params.task_id
 
-    ctx = contextvars.copy_context()
     # executor.bio.submit(service.sync_blocking, task_id)
+    ctx = contextvars.copy_context()
     executor.bio.submit(
         ctx.run,
         service.sync_blocking,
