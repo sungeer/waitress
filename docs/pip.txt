@@ -13,6 +13,8 @@ python -m pip install starlette uvicorn loguru httpx cryptography
 
 python -m pip install DBUtils PyMySQL PyJWT
 
+python -m pip install python-dotenv
+
 python -m pip install langchain-openai
 
 python -m pip install langgraph

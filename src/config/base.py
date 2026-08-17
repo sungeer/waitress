@@ -1,10 +1,19 @@
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 base_dir = Path(__file__).resolve().parent.parent.parent
+
+# development
+dotenv_path = base_dir / '.env'
+if dotenv_path.exists():
+    load_dotenv(dotenv_path)
 
 
 class BaseConfig:
-    log_path = base_dir / 'logs/app.log'      # 常规日志（INFO及以上）
+    version = '26.0817.0956'
+
+    log_path = base_dir / 'logs/app.log'  # 常规日志（INFO及以上）
     error_log_path = base_dir / 'logs/error.log'  # 错误日志（仅ERROR+）
 
     jwt_algorithm = 'HS256'  # 加密算法
