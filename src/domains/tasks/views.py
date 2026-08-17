@@ -13,7 +13,6 @@ from src.domains.tasks import service
 from src.domains.tasks.schema import SubmitRequest
 
 
-
 async def submit_async(request):
     data = await request.body()  # bytes
 
