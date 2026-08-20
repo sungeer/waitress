@@ -30,15 +30,18 @@ def parse_output(text: str) -> Dict[str, str]:
     if not text or not text.strip():
         return {}
 
+    # 按 ### 开头的行分割，保留标题标记
     sections = re.split(r'\n(?=###)', text.strip())
     result = {}
 
     for section in sections:
+        # 提取标题（### 后的内容）
         title_match = re.match(r'###\s*(.*?)\s*\n', section)
         if not title_match:
             continue
 
         title = title_match.group(1).strip()
+        # 提取正文（标题后的所有内容）
         body = section[title_match.end():].strip()
         result[title] = body
 
