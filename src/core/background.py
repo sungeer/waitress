@@ -14,10 +14,6 @@ class _BackgroundTasks:
         task.add_done_callback(self._tasks.discard)  # 完成后自动移出，防集合无限膨胀
         return task
 
-    @property
-    def count(self):
-        return len(self._tasks)
-
     async def shutdown(self):
         tasks = [task for task in self._tasks if not task.done()]
         for task in tasks:
