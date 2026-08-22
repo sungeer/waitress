@@ -22,7 +22,4 @@ routes = [
     Route('/tasks.submit.async', tasks_views.submit_async, methods=['POST']),
     Route('/tasks.submit.async_blocking', tasks_views.submit_async_blocking, methods=['POST']),
     Route('/tasks.submit.sync', tasks_views.submit_sync, methods=['POST']),
-
-    # 后台任务观测
-    Route('/tasks.count', tasks_views.background_count, methods=['POST']),
 ]
