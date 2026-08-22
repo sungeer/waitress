@@ -51,7 +51,7 @@ def insert_user(cursor, name, age):
 
     result = cursor.execute(sql, params)
 
-    return result.rowcount, result.lastrowid
+    return result.lastrowid
 
 
 def update_user_name(cursor, new_name, user_id):
