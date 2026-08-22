@@ -9,11 +9,9 @@ pip install -r requirements.txt
 pip uninstall asyncmy
 
 
-python -m pip install starlette uvicorn loguru httpx cryptography
+python -m pip install starlette uvicorn loguru httpx2 cryptography
 
-python -m pip install sqlalchemy PyMySQL PyJWT
-
-python -m pip install python-dotenv
+python -m pip install sqlalchemy PyMySQL PyJWT python-dotenv
 
 
 uvicorn app:app --host 0.0.0.0 --port 8000
