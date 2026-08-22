@@ -47,7 +47,11 @@ class JWTAuthBackend(AuthenticationBackend):
 
 
 def on_auth_error(request, exc):
-    return Response(
+    _ = request
+
+    response = Response(
         {'code': 401, 'msg': str(exc), 'data': None},
         status_code=401,
     )
+
+    return response
