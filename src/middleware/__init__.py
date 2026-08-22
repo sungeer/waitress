@@ -7,7 +7,7 @@ from src.middleware import tracing
 from src.middleware import auth_backend
 
 middleware = [
-    Middleware(tracing.RunIdMiddleware),  # 最外层 最先执行
+    Middleware(tracing.RequestIdMiddleware),  # 最外层 最先执行
     Middleware(
         CORSMiddleware,
         allow_origins=settings.origins,  # allow_origins=['*']  # 允许所有来源

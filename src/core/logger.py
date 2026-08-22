@@ -2,18 +2,18 @@ import sys
 
 from loguru import logger
 
-from src.core.context import run_id_var
+from src.core.context import request_id_var
 
 
 def setup_logger():
     logger.remove()
 
-    def inject_run_id(record):
-        record['extra']['run_id'] = run_id_var.get()
+    def inject_request_id(record):
+        record['extra']['request_id'] = request_id_var.get()
 
-    logger.configure(patcher=inject_run_id)
+    logger.configure(patcher=inject_request_id)
 
-    fmt = '{time:YYYY-MM-DD HH:mm:ss} - {level} - [{extra[run_id]}] {name}:{function}:{line} - {message}'
+    fmt = '{time:YYYY-MM-DD HH:mm:ss} - {level} - [{extra[request_id]}] {name}:{function}:{line} - {message}'
 
     logger.add(
         sink=sys.stdout,
