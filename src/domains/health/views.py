@@ -1,22 +1,13 @@
-from src.core.response import ok
-from src.domains.health import service
 from src.config import settings
-
-
-async def startup_probe(request):
-    environment = settings.environment
-    data = {
-        'environment': environment
-    }
-    return ok(data)
+from src.core.response import ok
 
 
 async def liveness(request):
-    data = {'status': 'alive'}
-    return ok(data)
+    _ = request  # 显式标记为已使用
 
+    data = {
+        'environment': settings.environment,
+        'status': 'alive'
+    }
 
-async def readiness(request):
-    await service.check_db_conn()
-    data = {'status': 'ready'}
     return ok(data)

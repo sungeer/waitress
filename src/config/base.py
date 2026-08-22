@@ -21,5 +21,3 @@ class BaseConfig:
 
     # 'openssl rand -hex 32'
     auth_key = '299095cc-1330-11e5-b06a-a45e60bec08b'  # HMAC 签名密钥
-    auth_timeout = 3  # 秒 请求有效期
-    auth_key_name = 'X-Auth-Key'
