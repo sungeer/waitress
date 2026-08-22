@@ -1,5 +1,5 @@
 from src.core.response import ok
-from src.domains.items import service
+from src.domains.users import service
 from src.utils import validate
 
 
@@ -15,33 +15,34 @@ async def get_user(request):
 async def list_users(request):
     data = await request.json()  # dict
 
-    min_age = validate.optional_int(data, 'min_age', 0)
     limit = validate.optional_int(data, 'limit', 20)
 
-    users = await service.list_users(min_age, limit)
+    users = await service.list_users(limit)
     return ok(data=users)
 
 
 async def create_user(request):
     data = await request.json()  # dict
 
-    name = validate.require_str(data, 'name')
-    age = validate.require_int(data, 'age')
+    external_user_id = validate.require_int(data, 'external_user_id')
+    username = validate.require_str(data, 'username')
+    display_name = validate.optional_str(data, 'display_name')
+    email = validate.optional_str(data, 'email')
 
-    new_id = await service.create_user(name, age)
+    new_id = await service.create_user(external_user_id, username, display_name, email)
     data = {
         'user_id': new_id
     }
     return ok(data=data, msg='创建成功')
 
 
-async def update_user_name(request):
+async def update_display_name(request):
     data = await request.json()  # dict
 
     user_id = validate.require_int(data, 'user_id')
-    new_name = validate.require_str(data, 'name')
+    display_name = validate.require_str(data, 'display_name')
 
-    await service.update_user_name(user_id, new_name)
+    await service.update_display_name(user_id, display_name)
     return ok(msg='更新成功')
 
 

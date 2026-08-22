@@ -3,8 +3,8 @@ from sqlalchemy import text
 
 def query_one(cursor, user_id):
     sql = text('''
-        SELECT id, name, age
-        FROM user
+        SELECT id, username, display_name, email
+        FROM users
         WHERE id = :id
     ''')
 
@@ -20,33 +20,35 @@ def query_one(cursor, user_id):
     return dict(row) if row else None
 
 
-def query_many(cursor, min_age, limit):
+def query_many(cursor, limit):
     sql = text('''
-        SELECT id, name, age
-        FROM user
-        WHERE age >= :min_age
+        SELECT id, username, display_name, email
+        FROM users
         ORDER BY id
         LIMIT :limit
     ''')
 
     params = {
-        'min_age': min_age,
         'limit': limit
     }
 
-    result = cursor.execute(sql, params
-                            )
+    result = cursor.execute(sql, params)
     rows = result.mappings().all()  # list[RowMapping]
 
     return [dict(r) for r in rows]
 
 
-def insert_user(cursor, name, age):
-    sql = text('INSERT INTO user(name, age) VALUES (:name, :age)')
+def insert_user(cursor, external_user_id, username, display_name, email):
+    sql = text('''
+        INSERT INTO users(external_user_id, username, display_name, email)
+        VALUES (:external_user_id, :username, :display_name, :email)
+    ''')
 
     params = {
-        'name': name,
-        'age': age
+        'external_user_id': external_user_id,
+        'username': username,
+        'display_name': display_name,
+        'email': email,
     }
 
     result = cursor.execute(sql, params)
@@ -54,11 +56,11 @@ def insert_user(cursor, name, age):
     return result.lastrowid
 
 
-def update_user_name(cursor, new_name, user_id):
-    sql = text('UPDATE user SET name = :name WHERE id = :id')
+def update_display_name(cursor, new_display_name, user_id):
+    sql = text('UPDATE users SET display_name = :display_name WHERE id = :id')
 
     params = {
-        'name': new_name,
+        'display_name': new_display_name,
         'id': user_id
     }
 
@@ -68,7 +70,7 @@ def update_user_name(cursor, new_name, user_id):
 
 
 def delete_user(cursor, user_id):
-    sql = text('DELETE FROM user WHERE id = :id')
+    sql = text('DELETE FROM users WHERE id = :id')
 
     params = {
         'id': user_id

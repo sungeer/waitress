@@ -22,3 +22,12 @@ def require_str(data, key):
     if not isinstance(value, str) or not value.strip():
         raise BadRequestError(f'{key} 不能为空')
     return value
+
+
+def optional_str(data, key, default=None):
+    value = data.get(key)
+    if value is None:
+        return default
+    if not isinstance(value, str) or not value.strip():
+        raise BadRequestError(f'{key} 不能为空')
+    return value
