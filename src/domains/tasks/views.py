@@ -14,10 +14,10 @@ from src.domains.tasks.schema import SubmitRequest
 
 
 async def submit_async(request):
-    data = await request.body()  # bytes
+    data = await request.json()
 
     try:
-        params = SubmitRequest.model_validate_json(data)
+        params = SubmitRequest.model_validate(data)
     except ValidationError as e:
         logger.warning(f'error from params:\n{e}')
         raise BadRequestError()
@@ -33,10 +33,10 @@ async def submit_async(request):
 
 # async + sync
 async def submit_async_blocking(request):
-    data = await request.body()  # bytes
+    data = await request.json()
 
     try:
-        params = SubmitRequest.model_validate_json(data)
+        params = SubmitRequest.model_validate(data)
     except ValidationError as e:
         logger.warning(f'error from params:\n{e}')
         raise BadRequestError()
