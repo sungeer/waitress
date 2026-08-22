@@ -11,15 +11,9 @@ pip uninstall asyncmy
 
 python -m pip install starlette uvicorn loguru httpx cryptography
 
-python -m pip install DBUtils PyMySQL PyJWT
+python -m pip install sqlalchemy PyMySQL PyJWT
 
 python -m pip install python-dotenv
-
-python -m pip install langchain-openai
-
-python -m pip install langgraph
-
-
 
 
 uvicorn app:app --host 0.0.0.0 --port 8000

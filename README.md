@@ -1,6 +1,6 @@
 # waitress
 
-*An agent built with LangGraph.*
+*An api built with Starlette.*
 
 ## Installation
 
