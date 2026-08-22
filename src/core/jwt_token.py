@@ -4,13 +4,13 @@ import jwt
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from starlette.authentication import AuthenticationError
 
-from src.config import settings
+from src import settings
 
 
 # 生成 JWT Access Token
 def create_access_token(user_id, username, roles=None, expires_minutes=None) -> str:
     if expires_minutes is None:
-        expires_minutes = settings.jwt_access_token_expire_minutes
+        expires_minutes = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
 
     expire = datetime.now(timezone.utc) + timedelta(minutes=expires_minutes)
 
@@ -24,7 +24,7 @@ def create_access_token(user_id, username, roles=None, expires_minutes=None) -> 
         'exp': expire,
         'type': 'access',
     }
-    return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
+    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
 # 解析 JWT Payload 不做业务校验
@@ -32,8 +32,8 @@ def _decode_token(token: str):
     try:
         return jwt.decode(
             token,
-            settings.jwt_secret_key,
-            algorithms=[settings.jwt_algorithm],
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM],
         )
     except ExpiredSignatureError:
         raise AuthenticationError('JWT Token 已过期')

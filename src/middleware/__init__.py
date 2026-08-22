@@ -2,7 +2,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 
-from src.config import settings
+from src import settings
 from src.middleware import tracing
 from src.middleware import auth_backend
 
@@ -10,7 +10,7 @@ middleware = [
     Middleware(tracing.RequestIdMiddleware),  # 最外层 最先执行
     Middleware(
         CORSMiddleware,
-        allow_origins=settings.origins,  # allow_origins=['*']  # 允许所有来源
+        allow_origins=settings.ORIGINS,  # allow_origins=['*']  # 允许所有来源
         allow_credentials=True,
         allow_methods=['*'],  # 允许所有方法
         allow_headers=['*'],  # 允许所有头部

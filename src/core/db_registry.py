@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 
-from src.config import settings
+from src import settings
 
 
 class _EngineHolder:
@@ -10,7 +10,7 @@ class _EngineHolder:
 
     def init(self):
         self._engine = create_engine(
-            settings.db_url,
+            settings.DB_URL,
             echo=False,  # 不打印SQL语句
             pool_size=5,  # 空闲连接 上限
             max_overflow=7,  # 高峰额外最多再开 10 条
