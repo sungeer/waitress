@@ -32,20 +32,19 @@ VERSION = '26.0817.0956'
 
 # JWT
 JWT_ALGORITHM = 'HS256'  # 加密算法
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRE_MINUTES', default='30'))
-AUTH_KEY = _require('AUTH_KEY')  # HMAC 签名密钥（机密）
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRE_MINUTES', default='600'))  # 访问令牌有效期 30分钟
+AUTH_KEY = _require('AUTH_KEY')  # HMAC 签名密钥（机密） 'openssl rand -hex 32'
 JWT_SECRET_KEY = _require('JWT_SECRET_KEY')  # JWT 签名密钥（机密）
 
-# CORS 允许的来源（逗号分隔，必填）
+# CORS 允许的来源（逗号分隔）
 ORIGINS = _require('ORIGINS').split(',')
 
-# MySQL（连接信息必填，端口保留标准默认）
+# MySQL
 DB_HOST = _require('DB_HOST')
 DB_PORT = int(os.getenv('DB_PORT', default='3306'))
 DB_USER = _require('DB_USER')
 DB_PASSWORD = _require('DB_PASSWORD')  # 数据库密码（机密）
 DB_NAME = _require('DB_NAME')
-# 由字段结构化拼接（SQLAlchemy URL 自动处理特殊字符转义）
 # 密码只来自 DB_PASSWORD 单点，便于后续对密码加密后在此解密
 DB_URL = URL.create(
     drivername='mysql+pymysql',
