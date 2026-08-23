@@ -7,6 +7,7 @@ routes = [
     # 健康检查
     Route('/healthz.liveness', health_views.liveness, methods=['GET']),
 
+    # 用户
     Route('/users.list', user_views.list_users, methods=['POST']),
     Route('/users.get', user_views.get_user, methods=['POST']),
     Route('/users.create', user_views.create_user, methods=['POST']),
