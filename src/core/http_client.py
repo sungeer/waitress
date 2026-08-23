@@ -7,7 +7,8 @@ class _AsyncClientHolder:
         self._client = None
 
     def init(self):
-        self._client = httpx2.AsyncClient(verify=False)
+        # 默认 100 条连接
+        self._client = httpx2.AsyncClient(timeout=5.0, verify=False)
 
     def get(self):
         if self._client is None:
