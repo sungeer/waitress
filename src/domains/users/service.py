@@ -28,16 +28,16 @@ async def list_users(limit: int):
     return users
 
 
-async def create_user(external_user_id: int, username: str, display_name: str | None, email: str | None):
+async def create_user(username: str, display_name: str | None, email: str | None):
     def run_sync():
         with db.connect() as cursor:
-            new_id = repository.insert_user(cursor, external_user_id, username, display_name, email)
+            new_id = repository.insert_user(cursor, username, display_name, email)
             cursor.commit()
             return new_id
 
-    new_id = await run_in_threadpool(executor.db, run_sync)
+    user_id = await run_in_threadpool(executor.db, run_sync)
 
-    return new_id
+    return user_id
 
 
 async def update_display_name(user_id: int, new_display_name: str):
@@ -47,11 +47,11 @@ async def update_display_name(user_id: int, new_display_name: str):
             cursor.commit()
             return rowcount
 
-    rowcount = await run_in_threadpool(executor.db, run_sync)
+    row_count = await run_in_threadpool(executor.db, run_sync)
 
-    if rowcount == 0:
+    if row_count == 0:
         raise BusinessError(BizCode.USER_NOT_FOUND, BizCode.USER_NOT_FOUND.message)
-    return rowcount
+    return row_count
 
 
 async def delete_user(user_id: int):
@@ -61,8 +61,8 @@ async def delete_user(user_id: int):
             cursor.commit()
             return rowcount
 
-    rowcount = await run_in_threadpool(executor.db, run_sync)
+    row_count = await run_in_threadpool(executor.db, run_sync)
 
-    if rowcount == 0:
+    if row_count == 0:
         raise BusinessError(BizCode.USER_NOT_FOUND, BizCode.USER_NOT_FOUND.message)
-    return rowcount
+    return row_count

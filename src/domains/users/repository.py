@@ -43,14 +43,13 @@ def query_many(cursor, limit):
     return [dict(r) for r in rows]
 
 
-def insert_user(cursor, external_user_id, username, display_name, email):
+def insert_user(cursor, username, display_name, email):
     sql = text('''
-        INSERT INTO users(external_user_id, username, display_name, email)
-        VALUES (:external_user_id, :username, :display_name, :email)
+        INSERT INTO users(username, display_name, email)
+        VALUES (:username, :display_name, :email)
     ''')
 
     params = {
-        'external_user_id': external_user_id,
         'username': username,
         'display_name': display_name,
         'email': email,

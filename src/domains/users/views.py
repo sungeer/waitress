@@ -24,12 +24,11 @@ async def list_users(request):
 async def create_user(request):
     data = await request.json()  # dict
 
-    external_user_id = validate.require_int(data, 'external_user_id')
     username = validate.require_str(data, 'username')
     display_name = validate.optional_str(data, 'display_name')
     email = validate.optional_str(data, 'email')
 
-    new_id = await service.create_user(external_user_id, username, display_name, email)
+    new_id = await service.create_user(username, display_name, email)
     data = {
         'user_id': new_id
     }
