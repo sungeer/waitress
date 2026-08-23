@@ -13,7 +13,7 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
 
         with logger.contextualize(trace_id=trace_id):
             start = time.perf_counter()
-            logger.info('hit', method=request.method, path=request.url.path)
+            logger.info('hit method={} path={}', request.method, request.url.path)
 
             status = 500  # 默认值：未处理异常统一按 500 收尾
             try:
@@ -22,11 +22,11 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
             finally:
                 elapsed_ms = round((time.perf_counter() - start) * 1000)
                 logger.info(
-                    'done',
-                    method=request.method,
-                    path=request.url.path,
-                    status=status,
-                    duration_ms=elapsed_ms,
+                    'done method={} path={} status={} duration_ms={}',
+                    request.method,
+                    request.url.path,
+                    status,
+                    elapsed_ms,
                 )
             response.headers['X-Request-ID'] = trace_id
             return response

@@ -20,7 +20,7 @@ async def list_users(request):
     limit = validate.optional_int(data, 'limit', 20)
 
     users = await service.list_users(limit)
-    logger.info('list users', limit=limit, count=len(users))
+    logger.info('list users limit={} count={}', limit, len(users))
     return ok(data=users)
 
 

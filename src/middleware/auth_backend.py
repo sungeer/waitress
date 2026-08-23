@@ -33,10 +33,10 @@ class JWTAuthBackend(AuthenticationBackend):
                 return None
             payload = jwt_token.verify_access_token(token)
         except AuthenticationError as e:
-            logger.warning('JWT auth failed', error=str(e), path=conn.url.path)
+            logger.warning('JWT auth failed error={} path={}', e, conn.url.path)
             raise
         except Exception:
-            logger.warning('JWT token parse failed', path=conn.url.path)
+            logger.warning('JWT token parse failed path={}', conn.url.path)
             raise AuthenticationError('JWT Token 解析失败')
 
         user_id = payload['user_id']
