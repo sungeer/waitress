@@ -3,9 +3,12 @@ from sqlalchemy import text
 
 def query_one(cursor, user_id):
     sql = text('''
-        SELECT id, username, display_name, email
-        FROM users
-        WHERE id = :id
+        SELECT
+            id, username, display_name, email
+        FROM
+            users
+        WHERE
+            id = :id
     ''')
 
     params = {
@@ -22,8 +25,10 @@ def query_one(cursor, user_id):
 
 def query_many(cursor, limit):
     sql = text('''
-        SELECT id, username, display_name, email
-        FROM users
+        SELECT
+            id, username, display_name, email
+        FROM
+            users
         ORDER BY id
         LIMIT :limit
     ''')
@@ -57,7 +62,14 @@ def insert_user(cursor, external_user_id, username, display_name, email):
 
 
 def update_display_name(cursor, new_display_name, user_id):
-    sql = text('UPDATE users SET display_name = :display_name WHERE id = :id')
+    sql = text('''
+        UPDATE
+            users
+        SET
+            display_name = :display_name
+        WHERE
+            id = :id
+    ''')
 
     params = {
         'display_name': new_display_name,
@@ -70,7 +82,12 @@ def update_display_name(cursor, new_display_name, user_id):
 
 
 def delete_user(cursor, user_id):
-    sql = text('DELETE FROM users WHERE id = :id')
+    sql = text('''
+        DELETE FROM
+            users
+        WHERE
+            id = :id
+    ''')
 
     params = {
         'id': user_id
