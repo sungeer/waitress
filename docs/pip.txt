@@ -12,7 +12,7 @@ pip uninstall asyncmy
 
 python -m pip install starlette uvicorn
 
-python -m pip install structlog httpx2 cryptography
+python -m pip install loguru httpx2 cryptography
 
 python -m pip install sqlalchemy PyMySQL
 

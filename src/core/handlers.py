@@ -1,11 +1,9 @@
-import structlog
+from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
 from src.core.codes import BizCode
 from src.core.exceptions import BusinessError, BadRequestError, UnauthorizedError, ForbiddenError
 from src.core.response import Response
-
-logger = structlog.get_logger(__name__)
 
 
 # 业务失败

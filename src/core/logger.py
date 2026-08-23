@@ -1,36 +1,41 @@
-import logging
-from pathlib import Path
+import sys
 
-import structlog
-from structlog.processors import CallsiteParameter, CallsiteParameterAdder
+from loguru import logger
 
 from src import settings
 
 
-def setup_logger():
-    if settings.ENVIRONMENT == 'development':
-        # 开发环境：保持输出到 stdout
-        logger_factory = structlog.PrintLoggerFactory()
-    else:
-        # 非 development（testing / production）：写入日志文件
-        log_path = Path(settings.LOG_FILE)
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-        logger_factory = structlog.WriteLoggerFactory(
-            open(log_path, 'a', encoding='utf-8')
-        )
+def _inject_trace_id(record):
+    trace_id = record['extra'].get('trace_id')
+    if trace_id:
+        record['message'] = f'{record["message"]} | trace_id={trace_id}'
 
-    structlog.configure(
-        processors=[
-            structlog.contextvars.merge_contextvars,  # 合并 contextvars 里的 trace_id
-            structlog.processors.add_log_level,  # level 字段
-            structlog.processors.TimeStamper(fmt='%Y-%m-%d %H:%M:%S', utc=False),  # 本地时间
-            structlog.processors.format_exc_info,  # logger.exception 输出堆栈
-            CallsiteParameterAdder(
-                [CallsiteParameter.QUAL_MODULE, CallsiteParameter.LINENO]
-            ),  # 模块名 + 行号
-            structlog.processors.JSONRenderer(ensure_ascii=False),  # JSON Lines，中文不转义
-        ],
-        wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
-        logger_factory=logger_factory,  # development 输出 stdout，其余写日志文件
-        cache_logger_on_first_use=False,  # 配合 merge_contextvars 不缓存绑定
-    )
+
+def setup_logger():
+    logger.remove()
+
+    logger.configure(patcher=_inject_trace_id)
+
+    fmt = '{time:YYYY-MM-DD HH:mm:ss} - {level} - {name}:{function}:{line} - {message}'
+
+    if settings.ENVIRONMENT == 'development':
+        logger.add(
+            sys.stdout,
+            format=fmt,
+            diagnose=False,
+            backtrace=False,
+            colorize=False,
+            enqueue=True,
+            level='INFO',
+        )
+    else:
+        logger.add(
+            settings.LOG_FILE,
+            format=fmt,
+            diagnose=False,
+            backtrace=False,
+            colorize=False,
+            enqueue=True,
+            level='INFO',
+            encoding='utf-8',
+        )

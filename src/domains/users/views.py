@@ -1,10 +1,8 @@
-import structlog
+from loguru import logger
 
 from src.core.response import ok
 from src.domains.users import service
 from src.utils import validate
-
-logger = structlog.get_logger(__name__)
 
 
 async def get_user(request):
