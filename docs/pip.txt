@@ -9,12 +9,20 @@ pip install -r requirements.txt
 pip uninstall asyncmy
 
 
-python -m pip install starlette uvicorn loguru httpx2 cryptography
 
-python -m pip install sqlalchemy PyMySQL PyJWT python-dotenv
+python -m pip install starlette uvicorn
+
+python -m pip install loguru httpx2 cryptography
+
+python -m pip install sqlalchemy PyMySQL
+
+python -m pip install PyJWT python-dotenv
+
+
 
 
 uvicorn app:app --host 0.0.0.0 --port 8000
+
 
 
 uvicorn app:app --host 0.0.0.0 --port 8000 --env-file /home/user/waitress-testing.env
