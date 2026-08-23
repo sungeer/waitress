@@ -1,6 +1,10 @@
+import structlog
+
 from src.core.response import ok
 from src.domains.users import service
 from src.utils import validate
+
+logger = structlog.get_logger(__name__)
 
 
 async def get_user(request):
@@ -18,6 +22,8 @@ async def list_users(request):
     limit = validate.optional_int(data, 'limit', 20)
 
     users = await service.list_users(limit)
+    raise
+    logger.info('list users', limit=limit, count=len(users))
     return ok(data=users)
 
 

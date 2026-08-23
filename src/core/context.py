@@ -1,7 +1,4 @@
 import uuid
-from contextvars import ContextVar
-
-request_id_var = ContextVar('request_id', default='-')
 
 
 def new_request_id() -> str:

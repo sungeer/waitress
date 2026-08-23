@@ -1,8 +1,10 @@
-from loguru import logger
+import structlog
 from starlette.authentication import AuthenticationBackend, AuthenticationError, AuthCredentials, BaseUser
 
 from src.core import jwt_token
 from src.core.response import Response
+
+logger = structlog.get_logger(__name__)
 
 
 class JWTUser(BaseUser):
@@ -33,10 +35,10 @@ class JWTAuthBackend(AuthenticationBackend):
                 return None
             payload = jwt_token.verify_access_token(token)
         except AuthenticationError as e:
-            logger.warning(f'[JWT] {e}, path={conn.url.path}')
+            logger.warning('JWT auth failed', error=str(e), path=conn.url.path)
             raise
         except Exception:
-            logger.warning(f'[JWT] Token 解析失败，path={conn.url.path}')
+            logger.warning('JWT token parse failed', path=conn.url.path)
             raise AuthenticationError('JWT Token 解析失败')
 
         user_id = payload['user_id']
