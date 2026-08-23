@@ -37,7 +37,7 @@ async def create_user(request):
     data = {
         'user_id': new_id
     }
-    return ok(data=data, msg='创建成功')
+    return ok(data=data, msg='created successfully')
 
 
 async def update_display_name(request):
@@ -47,7 +47,7 @@ async def update_display_name(request):
     display_name = validate.require_str(data, 'display_name')
 
     await service.update_display_name(user_id, display_name)
-    return ok(msg='更新成功')
+    return ok(msg='update successful')
 
 
 async def delete_user(request):
@@ -55,4 +55,4 @@ async def delete_user(request):
 
     user_id = validate.require_int(data, 'user_id')
     await service.delete_user(user_id)
-    return ok(msg='删除成功')
+    return ok(msg='deleted successfully')

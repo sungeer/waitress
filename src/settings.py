@@ -17,7 +17,7 @@ def _require(name: str) -> str:
     # 必填环境变量，缺失时启动即报错（fail fast）
     value = os.getenv(name)
     if value is None:
-        raise RuntimeError(f'缺少必需的环境变量: {name}')
+        raise RuntimeError(f'Missing required environment variables: {name}')
     return value
 
 
@@ -25,7 +25,11 @@ def _require(name: str) -> str:
 _ENVIRONMENTS = ('development', 'testing', 'production')
 ENVIRONMENT = _require('ENVIRONMENT')
 if ENVIRONMENT not in _ENVIRONMENTS:
-    raise ValueError(f'无效的 ENVIRONMENT: {ENVIRONMENT}，只允许 {sorted(_ENVIRONMENTS)}')
+    raise ValueError(f'Invalid ENVIRONMENT: {ENVIRONMENT}，only allowed {sorted(_ENVIRONMENTS)}')
+
+# 日志
+# 非 development 环境写入此文件
+LOG_FILE = os.getenv('LOG_FILE', default='/srv/logs/waitress.log')
 
 # 应用版本
 VERSION = '26.0823.0803'

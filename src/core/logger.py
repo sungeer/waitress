@@ -1,10 +1,24 @@
 import logging
+from pathlib import Path
 
 import structlog
 from structlog.processors import CallsiteParameter, CallsiteParameterAdder
 
+from src import settings
+
 
 def setup_logger():
+    if settings.ENVIRONMENT == 'development':
+        # 开发环境：保持输出到 stdout
+        logger_factory = structlog.PrintLoggerFactory()
+    else:
+        # 非 development（testing / production）：写入日志文件
+        log_path = Path(settings.LOG_FILE)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        logger_factory = structlog.WriteLoggerFactory(
+            open(log_path, 'a', encoding='utf-8')
+        )
+
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,  # 合并 contextvars 里的 trace_id
@@ -17,6 +31,6 @@ def setup_logger():
             structlog.processors.JSONRenderer(ensure_ascii=False),  # JSON Lines，中文不转义
         ],
         wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
-        logger_factory=structlog.PrintLoggerFactory(),  # 输出到 stdout
+        logger_factory=logger_factory,  # development 输出 stdout，其余写日志文件
         cache_logger_on_first_use=False,  # 配合 merge_contextvars 不缓存绑定
     )
