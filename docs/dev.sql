@@ -42,3 +42,10 @@ CREATE TABLE users (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='用户表';
+
+
+INSERT INTO users (username, display_name, email) VALUES
+    ('alice', '爱丽丝', 'alice@example.com'),
+    ('bob',   '鲍勃',   'bob@example.com'),
+    ('carol', '卡罗尔', 'carol@example.com');
+
