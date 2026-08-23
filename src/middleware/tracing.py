@@ -12,6 +12,7 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         trace_id = new_request_id()
 
         with logger.contextualize(trace_id=trace_id):
+            request.state.trace_id = trace_id
             start = time.perf_counter()
             logger.info('hit method={} path={}', request.method, request.url.path)
 

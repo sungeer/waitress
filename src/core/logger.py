@@ -26,14 +26,16 @@ def setup_logger():
             enqueue=True,
             level='INFO',
         )
-    else:
-        logger.add(
-            settings.LOG_FILE,
-            format=fmt,
-            diagnose=False,
-            backtrace=False,
-            colorize=False,
-            enqueue=True,
-            level='INFO',
-            encoding='utf-8',
-        )
+
+    logger.add(
+        settings.LOG_FILE,
+        format=fmt,
+        diagnose=False,
+        backtrace=False,
+        colorize=False,
+        enqueue=True,
+        level='INFO',
+        encoding='utf-8',
+        rotation='30 MB',
+        retention=2,
+    )

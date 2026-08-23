@@ -16,6 +16,7 @@ async def get_user(request):
 
 async def list_users(request):
     data = await request.json()  # dict
+    raise
 
     limit = validate.optional_int(data, 'limit', 20)
 

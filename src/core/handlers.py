@@ -61,7 +61,9 @@ async def server_error(request, exc):
     数据库崩了 依赖超时 等 系统级异常
     监控在这里感知
     """
-    logger.exception('unhandled server error path={}', request.url.path)
+    trace_id = getattr(request.state, 'trace_id', '-')
+    with logger.contextualize(trace_id=trace_id):
+        logger.exception('unhandled server error path={}', request.url.path)
     return Response(
         {'code': 500, 'msg': '服务器内部错误', 'data': None},
         status_code=500,

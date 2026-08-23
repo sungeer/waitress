@@ -28,8 +28,7 @@ if ENVIRONMENT not in _ENVIRONMENTS:
     raise ValueError(f'Invalid ENVIRONMENT: {ENVIRONMENT}，only allowed {sorted(_ENVIRONMENTS)}')
 
 # 日志
-# 非 development 环境写入此文件
-LOG_FILE = os.getenv('LOG_FILE', default='/srv/logs/waitress.log')
+LOG_FILE = BASE_DIR / 'logs/waitress.log'
 
 # 应用版本
 VERSION = '26.0823.0803'
