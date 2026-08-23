@@ -18,16 +18,18 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         start = time.perf_counter()
         logger.info('hit', method=request.method, path=request.url.path)
 
-        # 异常统一由 handlers.py 的 server_error(500 兜底)记录，这里不重复打
-        response = await call_next(request)
-
-        elapsed_ms = round((time.perf_counter() - start) * 1000)
-        logger.info(
-            'done',
-            method=request.method,
-            path=request.url.path,
-            status=response.status_code,
-            duration_ms=elapsed_ms,
-        )
+        status = 500  # 默认值：未处理异常统一按 500 收尾
+        try:
+            response = await call_next(request)
+            status = response.status_code
+        finally:
+            elapsed_ms = round((time.perf_counter() - start) * 1000)
+            logger.info(
+                'done',
+                method=request.method,
+                path=request.url.path,
+                status=status,
+                duration_ms=elapsed_ms,
+            )
         response.headers['X-Request-ID'] = trace_id
         return response
