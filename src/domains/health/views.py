@@ -7,7 +7,7 @@ async def liveness(request):
 
     data = {
         'environment': settings.ENVIRONMENT,
-        'status': 'alive'
+        'version': settings.VERSION,
     }
 
     return ok(data)

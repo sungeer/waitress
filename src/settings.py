@@ -31,7 +31,7 @@ if ENVIRONMENT not in _ENVIRONMENTS:
 LOG_FILE = BASE_DIR / 'logs/waitress.log'
 
 # 应用版本
-VERSION = '26.0823.0803'
+VERSION = '26.0824.0939'
 
 # JWT
 JWT_ALGORITHM = 'HS256'  # 加密算法
