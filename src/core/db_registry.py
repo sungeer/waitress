@@ -17,6 +17,11 @@ class _EngineHolder:
             pool_timeout=30,  # 取连接等待 30s 失败就报错
             pool_recycle=1800,  # 回收重连
             pool_pre_ping=True,  # 避免拿到失效连接
+            connect_args={
+                'connect_timeout': 10,  # 连不上 DB 时 10s 快速失败
+                'read_timeout': 30,  # 读挂死最多等 30s
+                'write_timeout': 30,  # 写挂死最多等 30s
+            },
         )
 
     def get(self):
