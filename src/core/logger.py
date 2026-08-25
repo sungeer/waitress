@@ -39,6 +39,6 @@ def setup_logger():
         enqueue=True,
         level='INFO',
         encoding='utf-8',
-        rotation='30 MB',
+        rotation='200 MB',
         retention=2,
     )
