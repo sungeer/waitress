@@ -26,7 +26,7 @@ def setup_logger():
             diagnose=False,
             backtrace=False,
             colorize=False,
-            enqueue=True,
+            enqueue=False,
             level='INFO',
         )
 

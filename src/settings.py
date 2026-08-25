@@ -28,7 +28,8 @@ if ENVIRONMENT not in _ENVIRONMENTS:
     raise ValueError(f'Invalid ENVIRONMENT: {ENVIRONMENT}，only allowed {sorted(_ENVIRONMENTS)}')
 
 # 日志
-LOG_FILE = BASE_DIR / 'logs/waitress.log'
+# LOG_FILE = BASE_DIR / 'logs/waitress.log'
+LOG_FILE = Path(os.getenv('LOG_FILE', default=str(BASE_DIR / 'logs/waitress.log')))
 
 # 应用版本
 VERSION = '26.0824.0939'
