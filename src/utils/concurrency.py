@@ -4,8 +4,6 @@ import functools
 
 
 def _run_with_context(context, func, *args):
-    # Python 3.13 的 asyncio.run_in_executor 不传播 contextvars，
-    # 这里在捕获的 context(含 trace_id)里执行目标函数
     return context.run(func, *args)
 
 
