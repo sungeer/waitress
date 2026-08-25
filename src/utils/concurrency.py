@@ -13,4 +13,4 @@ async def run_in_threadpool(executor, func, *args, **kwargs):
     if kwargs:
         func = functools.partial(func, **kwargs)
     context = contextvars.copy_context()  # 捕获调用方 context(含 trace_id)
-    return await loop.run_in_executor(executor, _run_with_context, context, func, *args)
+    return await loop.run_in_executor(executor, _run_with_context, context, func, *args)  # type: ignore[misc]
