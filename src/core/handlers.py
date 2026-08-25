@@ -18,7 +18,11 @@ async def business_error(request, exc):
 # 数据库约束冲突（如重复 username、email 等唯一键）
 async def integrity_error(request, exc):
     return Response(
-        {'code': BizCode.RESOURCE_CONFLICT, 'msg': BizCode.RESOURCE_CONFLICT.message, 'data': None},
+        {
+            'code': BizCode.RESOURCE_CONFLICT,
+            'msg': BizCode.RESOURCE_CONFLICT.message,
+            'data': None
+        },
         status_code=200,
     )
 
@@ -62,8 +66,10 @@ async def server_error(request, exc):
     监控在这里感知
     """
     trace_id = getattr(request.state, 'trace_id', '-')
+
     with logger.contextualize(trace_id=trace_id):
         logger.exception('unhandled server error path={}', request.url.path)
+
     return Response(
         {'code': 500, 'msg': '服务器内部错误', 'data': None},
         status_code=500,
