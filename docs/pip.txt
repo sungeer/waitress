@@ -29,3 +29,14 @@ uvicorn app:app --host 0.0.0.0 --port 8000 --env-file /home/user/waitress-testin
 
 
 nohup /srv/venvs/waitress/bin/gunicorn -c /srv/waitress/gunicorn.conf.py main:app > /dev/null 2>&1 &
+
+
+# 性能查看
+top -p $(pgrep -d',' gunicorn)
+
+# 删除
+rm -f /srv/waitress.tar
+rm -rf /srv/waitress
+
+# 进程查看
+ps -ef | grep gunicorn | grep -v grep
