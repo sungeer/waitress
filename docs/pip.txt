@@ -28,4 +28,4 @@ uvicorn app:app --host 0.0.0.0 --port 8000
 uvicorn app:app --host 0.0.0.0 --port 8000 --env-file /home/user/waitress-testing.env
 
 
-nohup gunicorn -c /srv/waitress/gunicorn.conf.py main:app > /dev/null 2>&1 &
+nohup /srv/venvs/waitress/bin/gunicorn -c /srv/waitress/gunicorn.conf.py main:app > /dev/null 2>&1 &
