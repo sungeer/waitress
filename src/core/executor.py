@@ -10,9 +10,8 @@ class _ExecutorPool:
         self.graph = None
 
     def init(self):
-        self.db = ThreadPoolExecutor(max_workers=8, thread_name_prefix='db')
-        self.bio = ThreadPoolExecutor(max_workers=3, thread_name_prefix='bio')
-        self.graph = ThreadPoolExecutor(max_workers=3, thread_name_prefix='graph')
+        self.db = ThreadPoolExecutor(max_workers=20, thread_name_prefix='db')
+        self.bio = ThreadPoolExecutor(max_workers=8, thread_name_prefix='bio')
 
     def shutdown(self):
         if self.db:
