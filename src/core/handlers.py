@@ -73,6 +73,7 @@ async def server_error(request, exc):
     return Response(
         {'code': 500, 'msg': '服务器内部错误', 'data': None},
         status_code=500,
+        headers={'X-Request-ID': trace_id},
     )
 
 
