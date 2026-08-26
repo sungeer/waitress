@@ -1,3 +1,5 @@
+from json import JSONDecodeError
+
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
@@ -9,6 +11,10 @@ from src.core.response import Response
 # 业务失败
 async def business_error(request, exc):
     # 前端通过 code 判断
+    logger.warning(
+        'business error method={} path={} code={} msg={}',
+        request.method, request.url.path, exc.code, exc.msg,
+    )
     return Response(
         {'code': exc.code, 'msg': exc.msg, 'data': exc.data},
         status_code=200,
@@ -17,6 +23,12 @@ async def business_error(request, exc):
 
 # 数据库约束冲突（如重复 username、email 等唯一键）
 async def integrity_error(request, exc):
+    _ = exc
+
+    logger.warning(
+        'integrity error method={} path={} code={}',
+        request.method, request.url.path, BizCode.RESOURCE_CONFLICT.value,
+    )
     return Response(
         {
             'code': BizCode.RESOURCE_CONFLICT,
@@ -29,14 +41,34 @@ async def integrity_error(request, exc):
 
 # 请求参数错误
 async def bad_request(request, exc):
+    logger.warning(
+        'bad request method={} path={} msg={}',
+        request.method, request.url.path, exc.msg,
+    )
     return Response(
         {'code': 400, 'msg': exc.msg, 'data': None},
         status_code=400,
     )
 
 
+# 请求体不是合法 JSON（空 body / 格式错误）
+async def json_decode_error(request, exc):
+    logger.warning(
+        'bad json method={} path={}',
+        request.method, request.url.path,
+    )
+    return Response(
+        {'code': 400, 'msg': 'the request body is not valid JSON', 'data': None},
+        status_code=400
+    )
+
+
 # 未登录
 async def unauthorized_error(request, exc):
+    logger.warning(
+        'unauthorized method={} path={} msg={}',
+        request.method, request.url.path, exc.msg,
+    )
     return Response(
         {'code': 401, 'msg': exc.msg, 'data': None},
         status_code=401,
@@ -45,6 +77,10 @@ async def unauthorized_error(request, exc):
 
 # 无权限 403
 async def forbidden_error(request, exc):
+    logger.warning(
+        'forbidden method={} path={} msg={}',
+        request.method, request.url.path, exc.msg,
+    )
     return Response(
         {'code': 403, 'msg': exc.msg, 'data': None},
         status_code=403,
@@ -53,6 +89,8 @@ async def forbidden_error(request, exc):
 
 # 路由匹配不到
 async def not_found(request, exc):
+    _ = request
+
     return Response(
         {'code': 404, 'msg': exc.detail, 'data': None},
         status_code=404,
@@ -65,6 +103,8 @@ async def server_error(request, exc):
     数据库崩了 依赖超时 等 系统级异常
     监控在这里感知
     """
+    _ = exc
+
     trace_id = getattr(request.state, 'trace_id', '-')
 
     with logger.contextualize(trace_id=trace_id):
@@ -82,6 +122,7 @@ exception_handlers = {
     500: server_error,  # raise HTTPException(status_code=500, detail='something wrong') 触发
     BusinessError: business_error,  # 类键
     BadRequestError: bad_request,
+    JSONDecodeError: json_decode_error,  # 请求体不是合法 JSON
     UnauthorizedError: unauthorized_error,
     ForbiddenError: forbidden_error,
     IntegrityError: integrity_error,  # 数据库约束冲突
