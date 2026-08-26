@@ -1,4 +1,16 @@
+from json import JSONDecodeError
+
 from src.core.exceptions import BadRequestError
+
+
+async def require_body(request):
+    try:
+        data = await request.json()
+    except JSONDecodeError:
+        raise BadRequestError('request body is not valid JSON')
+    if not isinstance(data, dict):
+        raise BadRequestError('request body must be a JSON object')
+    return data
 
 
 def require_int(data, key):

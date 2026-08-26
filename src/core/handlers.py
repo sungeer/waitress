@@ -1,5 +1,3 @@
-from json import JSONDecodeError
-
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
@@ -48,18 +46,6 @@ async def bad_request(request, exc):
     return Response(
         {'code': 400, 'msg': exc.msg, 'data': None},
         status_code=400,
-    )
-
-
-# 请求体不是合法 JSON（空 body / 格式错误）
-async def json_decode_error(request, exc):
-    logger.warning(
-        'bad json method={} path={}',
-        request.method, request.url.path,
-    )
-    return Response(
-        {'code': 400, 'msg': 'the request body is not valid JSON', 'data': None},
-        status_code=400
     )
 
 
@@ -122,7 +108,6 @@ exception_handlers = {
     500: server_error,  # raise HTTPException(status_code=500, detail='something wrong') 触发
     BusinessError: business_error,  # 类键
     BadRequestError: bad_request,
-    JSONDecodeError: json_decode_error,  # 请求体不是合法 JSON
     UnauthorizedError: unauthorized_error,
     ForbiddenError: forbidden_error,
     IntegrityError: integrity_error,  # 数据库约束冲突

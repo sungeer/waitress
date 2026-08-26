@@ -6,11 +6,7 @@ BASE_URL = 'http://127.0.0.1:8000'
 def list_users():
     url = f'{BASE_URL}/users.list'
 
-    data = {
-        'limit': 'a'
-    }
-
-    resp = httpx.post(url, json=data, timeout=5.0, verify=False)
+    resp = httpx.post(url, timeout=5.0, verify=False)
     print(resp.json())
     resp.raise_for_status()  # HTTP 层错误（4xx/5xx）直接抛出
     data = resp.json()

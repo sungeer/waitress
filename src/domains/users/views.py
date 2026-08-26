@@ -6,7 +6,7 @@ from src.utils import validate
 
 
 async def get_user(request):
-    data = await request.json()  # dict
+    data = await validate.require_body(request)  # dict
 
     user_id = validate.require_int(data, 'user_id')
 
@@ -15,7 +15,7 @@ async def get_user(request):
 
 
 async def list_users(request):
-    data = await request.json()  # dict
+    data = await validate.require_body(request)  # dict
 
     limit = validate.optional_int(data, 'limit', 20)
 
@@ -25,7 +25,7 @@ async def list_users(request):
 
 
 async def create_user(request):
-    data = await request.json()  # dict
+    data = await validate.require_body(request)  # dict
 
     username = validate.require_str(data, 'username')
     display_name = validate.optional_str(data, 'display_name')
@@ -39,7 +39,7 @@ async def create_user(request):
 
 
 async def update_display_name(request):
-    data = await request.json()  # dict
+    data = await validate.require_body(request)  # dict
 
     user_id = validate.require_int(data, 'user_id')
     display_name = validate.require_str(data, 'display_name')
@@ -49,7 +49,7 @@ async def update_display_name(request):
 
 
 async def delete_user(request):
-    data = await request.json()  # dict
+    data = await validate.require_body(request)  # dict
 
     user_id = validate.require_int(data, 'user_id')
     await service.delete_user(user_id)
