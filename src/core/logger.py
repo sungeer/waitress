@@ -15,7 +15,7 @@ def setup_logger():
     logger.configure(patcher=_inject_trace_id)
 
     fmt = (
-        '{time:YYYY-MM-DD HH:mm:ss} - [{extra[trace_id]}] - {level} - '
+        '{time:YYYY-MM-DD HH:mm:ss.SSS} - [{extra[trace_id]}] - {level} - '
         '{name}:{function}:{line} - {message}'
     )
 
