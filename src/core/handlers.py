@@ -8,11 +8,11 @@ from src.core.response import Response
 
 # 业务失败
 async def business_error(request, exc):
-    # 前端通过 code 判断
     logger.warning(
         'business error method={} path={} code={} msg={}',
         request.method, request.url.path, exc.code, exc.msg,
     )
+    # 前端通过 code 判断
     return Response(
         {'code': exc.code, 'msg': exc.msg, 'data': exc.data},
         status_code=200,
@@ -51,10 +51,8 @@ async def bad_request(request, exc):
 
 # 未登录
 async def unauthorized_error(request, exc):
-    logger.warning(
-        'unauthorized method={} path={} msg={}',
-        request.method, request.url.path, exc.msg,
-    )
+    _ = request
+
     return Response(
         {'code': 401, 'msg': exc.msg, 'data': None},
         status_code=401,
@@ -63,10 +61,8 @@ async def unauthorized_error(request, exc):
 
 # 无权限 403
 async def forbidden_error(request, exc):
-    logger.warning(
-        'forbidden method={} path={} msg={}',
-        request.method, request.url.path, exc.msg,
-    )
+    _ = request
+
     return Response(
         {'code': 403, 'msg': exc.msg, 'data': None},
         status_code=403,

@@ -2,7 +2,6 @@ from loguru import logger
 
 from src.core.response import ok
 from src.domains.users import service
-from src.domains.users.schemas import CreateUserSchema
 from src.utils import validate
 
 
@@ -28,9 +27,18 @@ async def list_users(request):
 async def create_user(request):
     data = await validate.require_body(request)  # dict
 
-    payload = validate.require_model(data, CreateUserSchema)
+    username = validate.require_str(data, 'username').strip()
+    display_name = validate.optional_str(data, 'display_name')
 
-    new_id = await service.create_user(payload.username, payload.display_name, payload.email)
+    if display_name is not None:
+        display_name = display_name.strip()
+
+    email = validate.optional_str(data, 'email')
+
+    if email is not None:
+        email = email.strip()
+
+    new_id = await service.create_user(username, display_name, email)
     return ok(data={'user_id': new_id}, msg='created successfully')
 
 
