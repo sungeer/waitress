@@ -16,6 +16,17 @@ async def require_body(request):
     return data
 
 
+def _extract_invalid_fields(validation_error: ValidationError) -> list[str]:
+    invalid_fields = []
+    for error in validation_error.errors():
+        # 只提取有问题的字段路径
+        field_path = '.'.join(str(loc) for loc in error['loc'])
+        if field_path:
+            invalid_fields.append(field_path)
+
+    return list(set(invalid_fields))
+
+
 def require_model(data: dict, model: type[BaseModel]):
     try:
         payload = model.model_validate(data)
@@ -24,7 +35,8 @@ def require_model(data: dict, model: type[BaseModel]):
             'request body validation failed model={} detail={}',
             model.__name__, e
         )
-        raise BadRequestError('bad request')
+        invalid_fields = _extract_invalid_fields(e)
+        raise BadRequestError(f'bad request: {invalid_fields}')
     return payload
 
 
