@@ -2,6 +2,7 @@ from loguru import logger
 
 from src.core.response import ok
 from src.domains.users import service
+from src.domains.users.schemas import CreateUserSchema
 from src.utils import validate
 
 
@@ -27,15 +28,10 @@ async def list_users(request):
 async def create_user(request):
     data = await validate.require_body(request)  # dict
 
-    username = validate.require_str(data, 'username')
-    display_name = validate.optional_str(data, 'display_name')
-    email = validate.optional_str(data, 'email')
+    payload = validate.require_model(data, CreateUserSchema)
 
-    new_id = await service.create_user(username, display_name, email)
-    data = {
-        'user_id': new_id
-    }
-    return ok(data=data, msg='created successfully')
+    new_id = await service.create_user(payload.username, payload.display_name, payload.email)
+    return ok(data={'user_id': new_id}, msg='created successfully')
 
 
 async def update_display_name(request):

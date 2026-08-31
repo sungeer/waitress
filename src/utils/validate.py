@@ -1,5 +1,8 @@
 from json import JSONDecodeError
 
+from loguru import logger
+from pydantic import BaseModel, ValidationError
+
 from src.core.exceptions import BadRequestError
 
 
@@ -43,3 +46,15 @@ def optional_str(data, key, default=None):
     if not isinstance(value, str) or not value.strip():
         raise BadRequestError(f'{key} cannot be empty')
     return value
+
+
+def require_model(data: dict, model: type[BaseModel]):
+    try:
+        payload = model.model_validate(data)
+    except ValidationError as e:
+        logger.warning(
+            'request body validation failed model={} detail={}',
+            model.__name__, e
+        )
+        raise BadRequestError('bad request')
+    return payload

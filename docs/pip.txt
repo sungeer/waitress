@@ -16,7 +16,7 @@ python -m pip install loguru httpx2 cryptography
 
 python -m pip install sqlalchemy PyMySQL
 
-python -m pip install PyJWT python-dotenv
+python -m pip install PyJWT python-dotenv pydantic
 
 
 
