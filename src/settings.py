@@ -36,7 +36,7 @@ VERSION = '26.0826.1754'
 
 # JWT
 JWT_ALGORITHM = 'HS256'  # 加密算法
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRE_MINUTES', default='600'))  # 访问令牌有效期 30分钟
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRE_MINUTES', default='600'))  # 访问令牌有效期 600分钟
 AUTH_KEY = _require('AUTH_KEY')  # HMAC 签名密钥 'openssl rand -hex 32'
 JWT_SECRET_KEY = _require('JWT_SECRET_KEY')  # JWT 签名密钥
 
