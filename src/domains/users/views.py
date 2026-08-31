@@ -27,19 +27,15 @@ async def list_users(request):
 async def create_user(request):
     data = await validate.require_body(request)  # dict
 
-    username = validate.require_str(data, 'username').strip()
+    username = validate.require_str(data, 'username')
     display_name = validate.optional_str(data, 'display_name')
-
-    if display_name is not None:
-        display_name = display_name.strip()
-
     email = validate.optional_str(data, 'email')
 
-    if email is not None:
-        email = email.strip()
-
     new_id = await service.create_user(username, display_name, email)
-    return ok(data={'user_id': new_id}, msg='created successfully')
+    data = {
+        'user_id': new_id
+    }
+    return ok(data=data, msg='created successfully')
 
 
 async def update_display_name(request):
