@@ -58,3 +58,8 @@ DB_URL = URL.create(
     port=DB_PORT,
     database=DB_NAME,
 )
+
+# RQ（任务队列）
+REDIS_URL = _require('REDIS_URL')  # redis://127.0.0.1:6379/0
+RQ_QUEUE_NAME = os.getenv('RQ_QUEUE_NAME', default='default')  # 队列名，queue.py / worker.py 共用
+RQ_LIFECYCLE_LOG = Path(os.getenv('RQ_LIFECYCLE_LOG', default=str(BASE_DIR / 'logs/rq_lifecycle.log')))  # worker 生命周期日志
