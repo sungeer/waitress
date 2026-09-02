@@ -16,7 +16,7 @@ async def background_count(request):
     return ok(data)
 
 
-async def submit_async(request):
+async def submit_task(request):
     data = await validate.require_body(request)  # dict
 
     user_id = validate.require_int(data, 'user_id')

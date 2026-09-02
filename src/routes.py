@@ -10,7 +10,7 @@ routes = [
 
     # 任务
     Route('/tasks.count', task_views.background_count, methods=['GET']),
-    Route('/tasks.submit', task_views.submit_async, methods=['POST']),
+    Route('/tasks.submit', task_views.submit_task, methods=['POST']),
 
     # 用户
     Route('/users.list', user_views.list_users, methods=['POST']),
