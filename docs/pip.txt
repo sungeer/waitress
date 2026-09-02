@@ -18,8 +18,6 @@ python -m pip install sqlalchemy PyMySQL
 
 python -m pip install PyJWT python-dotenv pydantic
 
-python -m pip install redis rq
-
 
 uvicorn app:app --host 0.0.0.0 --port 8000
 

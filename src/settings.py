@@ -32,7 +32,7 @@ if ENVIRONMENT not in _ENVIRONMENTS:
 LOG_FILE = Path(os.getenv('LOG_FILE', default=str(BASE_DIR / 'logs/waitress.log')))
 
 # 应用版本
-VERSION = '26.0902.0717'
+VERSION = '26.0902.0933'
 
 # JWT
 JWT_ALGORITHM = 'HS256'  # 加密算法
@@ -58,8 +58,3 @@ DB_URL = URL.create(
     port=DB_PORT,
     database=DB_NAME,
 )
-
-# RQ（任务队列）
-REDIS_URL = _require('REDIS_URL')  # redis://127.0.0.1:6379/0
-RQ_QUEUE_NAME = os.getenv('RQ_QUEUE_NAME', default='default')  # 队列名，queue.py / worker.py 共用
-RQ_LIFECYCLE_LOG = Path(os.getenv('RQ_LIFECYCLE_LOG', default=str(BASE_DIR / 'logs/rq_lifecycle.log')))  # worker 生命周期日志
