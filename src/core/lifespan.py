@@ -4,6 +4,7 @@ from src.core.logger import setup_logger
 from src.core.db_registry import db
 from src.core.executor import executor
 from src.core.http_client import httpx
+from src.core.background import background
 
 
 @asynccontextmanager
@@ -19,6 +20,8 @@ async def lifespan(app):
     executor.init()
 
     yield
+
+    await background.shutdown()
 
     await httpx.aclose()
 

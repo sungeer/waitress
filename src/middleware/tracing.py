@@ -16,8 +16,6 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         start = time.perf_counter()
 
         with logger.contextualize(trace_id=trace_id):
-            logger.info('hit method={} path={}', request.method, request.url.path)
-
             status = 500  # 默认值：未处理异常统一按 500 收尾
             try:
                 response = await call_next(request)
