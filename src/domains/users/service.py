@@ -14,7 +14,7 @@ async def get_user(user_id: int):
     user = await run_in_threadpool(executor.db, run_sync)
 
     if user is None:
-        raise BusinessError(BizCode.USER_NOT_FOUND, BizCode.USER_NOT_FOUND.message)
+        raise BusinessError(BizCode.USER_NOT_FOUND)
     return user
 
 
@@ -54,7 +54,7 @@ async def update_display_name(user_id: int, new_display_name: str):
     row_count = await run_in_threadpool(executor.db, run_sync)
 
     if row_count == 0:
-        raise BusinessError(BizCode.USER_NOT_FOUND, BizCode.USER_NOT_FOUND.message)
+        raise BusinessError(BizCode.USER_NOT_FOUND)
     return row_count
 
 
@@ -68,5 +68,5 @@ async def delete_user(user_id: int):
     row_count = await run_in_threadpool(executor.db, run_sync)
 
     if row_count == 0:
-        raise BusinessError(BizCode.USER_NOT_FOUND, BizCode.USER_NOT_FOUND.message)
+        raise BusinessError(BizCode.USER_NOT_FOUND)
     return row_count

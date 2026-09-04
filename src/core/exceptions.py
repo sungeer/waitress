@@ -9,9 +9,10 @@ class BusinessError(AppError):
     比如 库存不足 用户状态异常 参数业务校验失败
     """
 
-    def __init__(self, code: int, msg: str, data=None):
+    def __init__(self, code: int, msg: str | None = None, data=None):
         self.code = code
-        self.msg = msg
+        # 只传 code（如 BizCode 枚举）时自动取自带文案，避免 code/msg 成对重复
+        self.msg = msg if msg is not None else getattr(code, 'message', '')
         self.data = data
 
 

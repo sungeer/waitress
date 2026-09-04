@@ -21,7 +21,7 @@ def permission_required(scope):
         async def wrapper(request, *args, **kwargs):
             if not request.user.is_authenticated:
                 raise UnauthorizedError()
-            if scope not in request.user.roles:
+            if scope not in request.auth.scopes:
                 raise ForbiddenError(f'需要[{scope}]权限')
             return await func(request, *args, **kwargs)
 
