@@ -1,7 +1,7 @@
 from sqlalchemy import text
 
 
-def query_one(cursor, user_id):
+def query_one(conn, user_id: int) -> dict | None:
     sql = text('''
         SELECT
             id, username, display_name, email
@@ -15,7 +15,7 @@ def query_one(cursor, user_id):
         'id': user_id
     }
 
-    result = cursor.execute(sql, params)
+    result = conn.execute(sql, params)
 
     row = result.mappings().first()  # RowMapping | None
     # row = result.mappings().one()  # 没有或多于一条都会抛异常
@@ -23,7 +23,7 @@ def query_one(cursor, user_id):
     return dict(row) if row else None
 
 
-def query_many(cursor, limit):
+def query_many(conn, limit: int) -> list[dict]:
     sql = text('''
         SELECT
             id, username, display_name, email
@@ -37,13 +37,13 @@ def query_many(cursor, limit):
         'limit': limit
     }
 
-    result = cursor.execute(sql, params)
+    result = conn.execute(sql, params)
     rows = result.mappings().all()  # list[RowMapping]
 
     return [dict(r) for r in rows]
 
 
-def insert_user(cursor, username, display_name, email):
+def insert_user(conn, username: str, display_name: str | None, email: str) -> int:
     sql = text('''
         INSERT INTO users(username, display_name, email)
         VALUES (:username, :display_name, :email)
@@ -55,12 +55,12 @@ def insert_user(cursor, username, display_name, email):
         'email': email,
     }
 
-    result = cursor.execute(sql, params)
+    result = conn.execute(sql, params)
 
     return result.lastrowid
 
 
-def update_display_name(cursor, new_display_name, user_id):
+def update_display_name(conn, new_display_name: str, user_id: int) -> int:
     sql = text('''
         UPDATE
             users
@@ -75,12 +75,12 @@ def update_display_name(cursor, new_display_name, user_id):
         'id': user_id
     }
 
-    result = cursor.execute(sql, params)
+    result = conn.execute(sql, params)
 
     return result.rowcount
 
 
-def username_exists(cursor, username):
+def username_exists(conn, username: str) -> bool:
     sql = text('''
         SELECT 1
         FROM
@@ -93,12 +93,12 @@ def username_exists(cursor, username):
         'username': username
     }
 
-    row = cursor.execute(sql, params).mappings().first()
+    row = conn.execute(sql, params).mappings().first()
 
     return row is not None
 
 
-def email_exists(cursor, email):
+def email_exists(conn, email: str) -> bool:
     sql = text('''
         SELECT 1
         FROM
@@ -111,12 +111,12 @@ def email_exists(cursor, email):
         'email': email
     }
 
-    row = cursor.execute(sql, params).mappings().first()
+    row = conn.execute(sql, params).mappings().first()
 
     return row is not None
 
 
-def delete_user(cursor, user_id):
+def delete_user(conn, user_id: int) -> int:
     sql = text('''
         DELETE FROM
             users
@@ -128,6 +128,6 @@ def delete_user(cursor, user_id):
         'id': user_id
     }
 
-    result = cursor.execute(sql, params)
+    result = conn.execute(sql, params)
 
     return result.rowcount

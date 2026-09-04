@@ -9,13 +9,13 @@ from src.core.context import new_request_id
 class RequestIdMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request, call_next):
-        trace_id = new_request_id()
+        request_id = new_request_id()
 
-        request.state.trace_id = trace_id
+        request.state.request_id = request_id
 
         start = time.perf_counter()
 
-        with logger.contextualize(trace_id=trace_id):
+        with logger.contextualize(request_id=request_id):
             status = 500  # 默认值：未处理异常统一按 500 收尾
             try:
                 response = await call_next(request)
@@ -30,5 +30,5 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
                     elapsed_ms,
                 )
 
-        response.headers['X-Request-ID'] = trace_id
+        response.headers['X-Request-ID'] = request_id
         return response

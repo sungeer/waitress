@@ -22,30 +22,30 @@ async def business_error(request, exc):
 
 # 未登录
 async def unauthorized_error(request, exc):
-    _ = request
     return Response.make(401, exc.msg, None, http_status=401)
 
 
 # 无权限 403
 async def forbidden_error(request, exc):
-    _ = request
     return Response.make(403, exc.msg, None, http_status=403)
 
 
 # 路由匹配不到
 async def not_found(request, exc):
-    _ = request
     return Response.make(404, exc.detail, None, http_status=404)
 
 
 # 唯一键/约束冲突兜底
 async def integrity_conflict(request, exc):
-    _ = exc
     logger.warning(
         'integrity conflict method={} path={} code={}',
         request.method, request.url.path, BizCode.RESOURCE_CONFLICT.value,
     )
-    return Response.make(BizCode.RESOURCE_CONFLICT, BizCode.RESOURCE_CONFLICT.message, None)
+    return Response.make(
+        BizCode.RESOURCE_CONFLICT,
+        BizCode.RESOURCE_CONFLICT.message,
+        None
+    )
 
 
 # 内部错误 500
@@ -54,13 +54,17 @@ async def server_error(request, exc):
     数据库崩了 依赖超时 等 系统级异常
     监控在这里感知
     """
-    _ = exc
-    trace_id = getattr(request.state, 'trace_id', '-')
+    request_id = getattr(request.state, 'request_id', '-')
 
-    with logger.contextualize(trace_id=trace_id):
+    with logger.contextualize(request_id=request_id):
         logger.exception('unhandled server error path={}', request.url.path)
 
-    return Response.make(500, '服务器内部错误', None, http_status=500, headers={'X-Request-ID': trace_id})
+    return Response.make(
+        500, '服务器内部错误',
+        None,
+        http_status=500,
+        headers={'X-Request-ID': request_id}
+    )
 
 
 exception_handlers = {

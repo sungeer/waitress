@@ -52,5 +52,4 @@ class JWTAuthBackend(AuthenticationBackend):
 
 
 def on_auth_error(request, exc):
-    _ = request
     return Response.make(401, str(exc), None, http_status=401)
