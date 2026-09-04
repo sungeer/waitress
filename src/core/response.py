@@ -3,6 +3,7 @@ from typing import Any
 
 from starlette.responses import JSONResponse
 
+from src.core.codes import BizCode
 from src.utils.serial import JsonExtendEncoder
 
 
@@ -18,14 +19,21 @@ class Response(JSONResponse):
             separators=(',', ':'),
         ).encode('utf-8')
 
+    @classmethod
+    def make(cls, code: int, msg: str, data=None, http_status: int = 200, headers=None):
+        """统一响应外壳 {code, msg, data} 的唯一构造入口
+        code 业务码语义见 src/core/codes.py
+        """
+        return cls(
+            {'code': code, 'msg': msg, 'data': data},
+            status_code=http_status,
+            headers=headers,
+        )
+
 
 # 成功响应
 def ok(data=None, msg='success'):
-    return Response({
-        'code': 0,
-        'msg': msg,
-        'data': data,
-    })
+    return Response.make(BizCode.OK, msg, data)
 
 
 # 业务失败响应
@@ -34,8 +42,4 @@ def fail(code: int, msg: str, data=None):
     HTTP 状态码仍为 200
     通常不直接调用，而是通过 raise BusinessError 触发
     """
-    return Response({
-        'code': code,
-        'msg': msg,
-        'data': data,
-    }, status_code=200)
+    return Response.make(code, msg, data)
