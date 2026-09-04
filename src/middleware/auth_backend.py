@@ -1,5 +1,10 @@
 from loguru import logger
-from starlette.authentication import AuthenticationBackend, AuthenticationError, AuthCredentials, BaseUser
+from starlette.authentication import (
+    AuthenticationBackend,
+    AuthenticationError,
+    AuthCredentials,
+    BaseUser
+)
 
 from src.core import jwt_token
 from src.core.response import Response
