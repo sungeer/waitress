@@ -4,7 +4,6 @@ from sqlalchemy.exc import IntegrityError
 from src.core.codes import BizCode
 from src.core.exceptions import (
     BusinessError,
-    BadRequestError,
     UnauthorizedError,
     ForbiddenError
 )
@@ -21,18 +20,6 @@ async def business_error(request, exc):
     return Response(
         {'code': exc.code, 'msg': exc.msg, 'data': exc.data},
         status_code=200,
-    )
-
-
-# 请求参数错误
-async def bad_request(request, exc):
-    logger.warning(
-        'bad request method={} path={} msg={}',
-        request.method, request.url.path, exc.msg,
-    )
-    return Response(
-        {'code': 400, 'msg': exc.msg, 'data': None},
-        status_code=400,
     )
 
 
@@ -108,7 +95,6 @@ exception_handlers = {
     404: not_found,  # 整数键 由 Starlette 内部触发
     500: server_error,  # raise HTTPException(status_code=500, detail='something wrong') 触发
     BusinessError: business_error,  # 类键
-    BadRequestError: bad_request,
     UnauthorizedError: unauthorized_error,
     ForbiddenError: forbidden_error,
     IntegrityError: integrity_conflict,  # 唯一键/约束冲突兜底（预检漏网的竞态等）

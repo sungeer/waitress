@@ -3,16 +3,17 @@ from json import JSONDecodeError
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 
-from src.core.exceptions import BadRequestError
+from src.core.codes import BizCode
+from src.core.exceptions import BusinessError
 
 
 async def require_body(request):
     try:
         data = await request.json()
     except JSONDecodeError:
-        raise BadRequestError('request body is not valid JSON')
+        raise BusinessError(BizCode.PARAM_ERROR, 'request body is not valid JSON')
     if not isinstance(data, dict):
-        raise BadRequestError('request body must be a JSON object')
+        raise BusinessError(BizCode.PARAM_TYPE_ERROR, 'request body must be a JSON object')
     return data
 
 
@@ -36,14 +37,16 @@ def require_model(data: dict, model: type[BaseModel]):
             model.__name__, e
         )
         invalid_fields = _extract_invalid_fields(e)
-        raise BadRequestError(f'bad request: {invalid_fields}')
+        raise BusinessError(BizCode.PARAM_ERROR, f'bad request: {invalid_fields}')
     return payload
 
 
 def require_int(data, key):
     value = data.get(key)
+    if value is None:
+        raise BusinessError(BizCode.PARAM_MISSING, f'{key} is required')
     if not isinstance(value, int) or isinstance(value, bool):
-        raise BadRequestError(f'{key} must be an integer')
+        raise BusinessError(BizCode.PARAM_TYPE_ERROR, f'{key} must be an integer')
     return value
 
 
@@ -52,14 +55,18 @@ def optional_int(data, key, default):
     if value is None:
         return default
     if not isinstance(value, int) or isinstance(value, bool):
-        raise BadRequestError(f'{key} must be an integer')
+        raise BusinessError(BizCode.PARAM_TYPE_ERROR, f'{key} must be an integer')
     return value
 
 
 def require_str(data, key):
     value = data.get(key)
-    if not isinstance(value, str) or not value.strip():
-        raise BadRequestError(f'{key} cannot be empty')
+    if value is None:
+        raise BusinessError(BizCode.PARAM_MISSING, f'{key} is required')
+    if not isinstance(value, str):
+        raise BusinessError(BizCode.PARAM_TYPE_ERROR, f'{key} must be a string')
+    if not value.strip():
+        raise BusinessError(BizCode.PARAM_ERROR, f'{key} cannot be empty')
     return value
 
 
@@ -67,6 +74,8 @@ def optional_str(data, key, default=None):
     value = data.get(key)
     if value is None:
         return default
-    if not isinstance(value, str) or not value.strip():
-        raise BadRequestError(f'{key} cannot be empty')
+    if not isinstance(value, str):
+        raise BusinessError(BizCode.PARAM_TYPE_ERROR, f'{key} must be a string')
+    if not value.strip():
+        raise BusinessError(BizCode.PARAM_ERROR, f'{key} cannot be empty')
     return value

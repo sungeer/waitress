@@ -15,13 +15,6 @@ class BusinessError(AppError):
         self.data = data
 
 
-# 400
-class BadRequestError(AppError):
-
-    def __init__(self, msg='请求参数错误'):
-        self.msg = msg
-
-
 # 401
 class UnauthorizedError(AppError):
 
