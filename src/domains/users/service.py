@@ -1,6 +1,4 @@
-from sqlalchemy.exc import IntegrityError
-
-from src.core.exceptions import BusinessError
+from src.core.exceptions import BusinessError, DuplicateKeyError
 from src.core.codes import BizCode
 from src.core.executor import executor
 from src.core.db_registry import db
@@ -40,8 +38,7 @@ async def create_user(username: str, display_name: str | None, email: str):
             try:
                 new_id = repository.insert_user(cursor, username, display_name, email)
                 cursor.commit()
-            except IntegrityError as exc:
-                # 预检与写入之间的竞态漏网：对方已提交同名或同邮箱
+            except DuplicateKeyError as exc:
                 raise BusinessError(BizCode.USER_ALREADY_EXISTS, '用户名或邮箱已被占用') from exc
             return new_id
 

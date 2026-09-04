@@ -32,7 +32,7 @@ if ENVIRONMENT not in _ENVIRONMENTS:
 LOG_FILE = Path(os.getenv('LOG_FILE', default=str(BASE_DIR / 'logs/waitress.log')))
 
 # 应用版本
-VERSION = '26.0904.1411'
+VERSION = '26.0904.1723'
 
 # JWT
 JWT_ALGORITHM = 'HS256'  # 加密算法
