@@ -42,7 +42,7 @@ class JWTAuthBackend(AuthenticationBackend):
             raise
         except Exception:
             logger.warning('JWT token parse failed path={}', conn.url.path)
-            raise AuthenticationError('JWT Token 解析失败')
+            raise AuthenticationError('JWT token parse failed')
 
         user_id = payload['user_id']
         username = payload['username']
