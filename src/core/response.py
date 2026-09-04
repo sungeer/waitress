@@ -3,7 +3,6 @@ from typing import Any
 
 from starlette.responses import JSONResponse
 
-from src.core.codes import BizCode
 from src.utils.serial import JsonExtendEncoder
 
 
@@ -32,14 +31,6 @@ class Response(JSONResponse):
 
 
 # 成功响应
-def ok(data=None, msg='success'):
-    return Response.make(BizCode.OK, msg, data)
-
-
-# 业务失败响应
-def fail(code: int, msg: str, data=None):
-    """业务失败响应
-    HTTP 状态码仍为 200
-    通常不直接调用，而是通过 raise BusinessError 触发
-    """
-    return Response.make(code, msg, data)
+def success(data=None, msg='success'):
+    # 成功码约定为 0（前端以 code == 0 判成功），直接写死，不引用枚举
+    return Response.make(0, msg, data)

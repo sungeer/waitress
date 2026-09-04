@@ -1,6 +1,6 @@
 from loguru import logger
 
-from src.core.response import ok
+from src.core.response import success
 from src.domains.users import service
 from src.utils import validate
 
@@ -11,7 +11,7 @@ async def get_user(request):
     user_id = validate.require_int(data, 'user_id')
 
     user = await service.get_user(user_id)
-    return ok(data=user)
+    return success(data=user)
 
 
 async def list_users(request):
@@ -21,7 +21,7 @@ async def list_users(request):
 
     users = await service.list_users(limit)
     logger.info('list users limit={} count={}', limit, len(users))
-    return ok(data=users)
+    return success(data=users)
 
 
 async def create_user(request):
@@ -35,7 +35,7 @@ async def create_user(request):
     data = {
         'user_id': new_id
     }
-    return ok(data=data, msg='created successfully')
+    return success(data=data, msg='created successfully')
 
 
 async def update_display_name(request):
@@ -45,7 +45,7 @@ async def update_display_name(request):
     display_name = validate.require_str(data, 'display_name')
 
     await service.update_display_name(user_id, display_name)
-    return ok(msg='update successful')
+    return success(msg='update successful')
 
 
 async def delete_user(request):
@@ -53,4 +53,4 @@ async def delete_user(request):
 
     user_id = validate.require_int(data, 'user_id')
     await service.delete_user(user_id)
-    return ok(msg='deleted successfully')
+    return success(msg='deleted successfully')

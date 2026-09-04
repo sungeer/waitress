@@ -10,9 +10,6 @@ class BizCode(IntEnum):
         obj.message = message
         return obj
 
-    # 成功
-    OK = (0, '成功')
-
     # 通用 参数错误
     PARAM_ERROR = (1001, '请求参数错误')
     PARAM_MISSING = (1002, '缺少必要参数')
@@ -24,9 +21,3 @@ class BizCode(IntEnum):
     # 用户
     USER_NOT_FOUND = (2001, '用户不存在')
     USER_ALREADY_EXISTS = (2003, '用户已存在')
-
-
-if __name__ == '__main__':
-    print(BizCode.OK)
-    print(BizCode.OK.message)
-    print(BizCode.PARAM_ERROR)

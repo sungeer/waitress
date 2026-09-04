@@ -1,5 +1,5 @@
 from src import settings
-from src.core.response import ok
+from src.core.response import success
 
 
 async def liveness(request):
@@ -9,4 +9,4 @@ async def liveness(request):
         'environment': settings.ENVIRONMENT,
         'version': settings.VERSION,
     }
-    return ok(data)
+    return success(data)
