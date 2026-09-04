@@ -29,7 +29,7 @@ async def create_user(request):
 
     username = validate.require_str(data, 'username')
     display_name = validate.optional_str(data, 'display_name')
-    email = validate.optional_str(data, 'email')
+    email = validate.require_str(data, 'email')
 
     new_id = await service.create_user(username, display_name, email)
     data = {

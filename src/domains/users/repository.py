@@ -80,6 +80,42 @@ def update_display_name(cursor, new_display_name, user_id):
     return result.rowcount
 
 
+def username_exists(cursor, username):
+    sql = text('''
+        SELECT 1
+        FROM
+            users
+        WHERE
+            username = :username
+    ''')
+
+    params = {
+        'username': username
+    }
+
+    row = cursor.execute(sql, params).mappings().first()
+
+    return row is not None
+
+
+def email_exists(cursor, email):
+    sql = text('''
+        SELECT 1
+        FROM
+            users
+        WHERE
+            email = :email
+    ''')
+
+    params = {
+        'email': email
+    }
+
+    row = cursor.execute(sql, params).mappings().first()
+
+    return row is not None
+
+
 def delete_user(cursor, user_id):
     sql = text('''
         DELETE FROM

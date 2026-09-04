@@ -1,8 +1,11 @@
 from loguru import logger
-from sqlalchemy.exc import IntegrityError
 
-from src.core.codes import BizCode
-from src.core.exceptions import BusinessError, BadRequestError, UnauthorizedError, ForbiddenError
+from src.core.exceptions import (
+    BusinessError,
+    BadRequestError,
+    UnauthorizedError,
+    ForbiddenError
+)
 from src.core.response import Response
 
 
@@ -15,24 +18,6 @@ async def business_error(request, exc):
     # 前端通过 code 判断
     return Response(
         {'code': exc.code, 'msg': exc.msg, 'data': exc.data},
-        status_code=200,
-    )
-
-
-# 数据库约束冲突（如重复 username、email 等唯一键）
-async def integrity_error(request, exc):
-    _ = exc
-
-    logger.warning(
-        'integrity error method={} path={} code={}',
-        request.method, request.url.path, BizCode.RESOURCE_CONFLICT.value,
-    )
-    return Response(
-        {
-            'code': BizCode.RESOURCE_CONFLICT,
-            'msg': BizCode.RESOURCE_CONFLICT.message,
-            'data': None
-        },
         status_code=200,
     )
 
@@ -106,6 +91,5 @@ exception_handlers = {
     BadRequestError: bad_request,
     UnauthorizedError: unauthorized_error,
     ForbiddenError: forbidden_error,
-    IntegrityError: integrity_error,  # 数据库约束冲突
     Exception: server_error,  # 必须放最后 处理所有没被预料到的 Python 异常
 }

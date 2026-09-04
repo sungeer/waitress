@@ -9,5 +9,4 @@ async def liveness(request):
         'environment': settings.ENVIRONMENT,
         'version': settings.VERSION,
     }
-
     return ok(data)
