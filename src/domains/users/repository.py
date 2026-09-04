@@ -1,7 +1,4 @@
 from sqlalchemy import text
-from sqlalchemy.exc import IntegrityError
-
-from src.core.exceptions import DuplicateKeyError
 
 
 def query_one(cursor, user_id):
@@ -58,10 +55,7 @@ def insert_user(cursor, username, display_name, email):
         'email': email,
     }
 
-    try:
-        result = cursor.execute(sql, params)
-    except IntegrityError as exc:
-        raise DuplicateKeyError from exc
+    result = cursor.execute(sql, params)
 
     return result.lastrowid
 

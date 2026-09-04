@@ -1,4 +1,4 @@
-from src.core.exceptions import BusinessError, DuplicateKeyError
+from src.core.exceptions import BusinessError
 from src.core.codes import BizCode
 from src.core.executor import executor
 from src.core.db_registry import db
@@ -35,11 +35,8 @@ async def create_user(username: str, display_name: str | None, email: str):
                 raise BusinessError(BizCode.USER_ALREADY_EXISTS, '用户名已存在')
             if repository.email_exists(cursor, email):
                 raise BusinessError(BizCode.USER_ALREADY_EXISTS, '邮箱已存在')
-            try:
-                new_id = repository.insert_user(cursor, username, display_name, email)
-                cursor.commit()
-            except DuplicateKeyError as exc:
-                raise BusinessError(BizCode.USER_ALREADY_EXISTS, '用户名或邮箱已被占用') from exc
+            new_id = repository.insert_user(cursor, username, display_name, email)
+            cursor.commit()
             return new_id
 
     user_id = await run_in_threadpool(executor.db, run_sync)

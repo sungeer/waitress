@@ -34,12 +34,3 @@ class ForbiddenError(AppError):
 
     def __init__(self, msg='无权限'):
         self.msg = msg
-
-
-# 唯一键冲突
-class DuplicateKeyError(AppError):
-    """唯一键冲突
-    repository 在持久化边界把 IntegrityError 翻译成此信号
-    service 捕获后转成业务错误
-    """
-    pass

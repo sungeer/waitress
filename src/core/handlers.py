@@ -1,5 +1,7 @@
 from loguru import logger
+from sqlalchemy.exc import IntegrityError
 
+from src.core.codes import BizCode
 from src.core.exceptions import (
     BusinessError,
     BadRequestError,
@@ -64,6 +66,24 @@ async def not_found(request, exc):
     )
 
 
+# 唯一键/约束冲突兜底
+async def integrity_conflict(request, exc):
+    _ = exc
+
+    logger.warning(
+        'integrity conflict method={} path={} code={}',
+        request.method, request.url.path, BizCode.RESOURCE_CONFLICT.value,
+    )
+    return Response(
+        {
+            'code': BizCode.RESOURCE_CONFLICT,
+            'msg': BizCode.RESOURCE_CONFLICT.message,
+            'data': None
+        },
+        status_code=200,
+    )
+
+
 # 内部错误 500
 async def server_error(request, exc):
     """兜底处理
@@ -91,5 +111,6 @@ exception_handlers = {
     BadRequestError: bad_request,
     UnauthorizedError: unauthorized_error,
     ForbiddenError: forbidden_error,
+    IntegrityError: integrity_conflict,  # 唯一键/约束冲突兜底（预检漏网的竞态等）
     Exception: server_error,  # 必须放最后 处理所有没被预料到的 Python 异常
 }
