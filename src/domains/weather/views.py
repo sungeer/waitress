@@ -30,6 +30,8 @@ async def weather_get(request):
     data = service.to_data(snap, now_time)
 
     if not data['fresh'] and service.should_attempt(snap, now_time):
-        background.spawn(service.refresh_runner(cell, lat_r, lon_r))
+        background.spawn(
+            service.refresh_runner(cell, lat_r, lon_r)
+        )
 
     return ok(data)
