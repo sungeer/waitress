@@ -9,8 +9,6 @@ from src.core.background import background
 
 @asynccontextmanager
 async def lifespan(app):
-    _ = app
-
     setup_logger()
 
     httpx.init()
