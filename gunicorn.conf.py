@@ -8,6 +8,6 @@ chdir = '/srv/waitress'
 pidfile = '/srv/run/waitress.pid'
 
 workers = 1
-worker_class = 'uvicorn.workers.UvicornWorker'
+worker_class = 'uvicorn_worker.UvicornWorker'
 
 errorlog = '/srv/logs/gunicorn.log'

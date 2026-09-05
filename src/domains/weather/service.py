@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timedelta
 
 from loguru import logger
+from sqlalchemy.exc import IntegrityError
 
 from src.core.db_registry import db
 from src.core.executor import executor
@@ -90,7 +91,10 @@ async def _store_success(cell: str, payload: dict, has_row: bool):
             if has_row:
                 repository.update_success(conn, cell, payload, now())
             else:
-                repository.insert(conn, cell, payload, now())
+                try:
+                    repository.insert(conn, cell, payload, now())
+                except IntegrityError:
+                    pass
             conn.commit()
 
     await run_in_threadpool(executor.db, run_sync)
