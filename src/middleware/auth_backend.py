@@ -7,7 +7,7 @@ from starlette.authentication import (
 )
 
 from src.core import jwt_token
-from src.core.response import Response
+from src.core.response import fail
 
 
 class JWTUser(BaseUser):
@@ -52,4 +52,4 @@ class JWTAuthBackend(AuthenticationBackend):
 
 
 def on_auth_error(request, exc):
-    return Response.make(401, str(exc), None, http_status=401)
+    return fail(401, str(exc), None, http_status=401)

@@ -1,6 +1,6 @@
 from loguru import logger
 
-from src.core.response import success
+from src.core.response import ok
 from src.domains.tasks import service
 from src.utils import validate
 from src.core.background import background
@@ -13,7 +13,7 @@ async def background_count(request):
     data = {
         'count': background.count
     }
-    return success(data)
+    return ok(data)
 
 
 async def submit_task(request):
@@ -29,4 +29,4 @@ async def submit_task(request):
         service.blocking_caller(task_id)
     )
 
-    return success(task_id)
+    return ok(task_id)

@@ -7,7 +7,7 @@ from src.core.exceptions import (
     UnauthorizedError,
     ForbiddenError
 )
-from src.core.response import Response
+from src.core.response import fail
 
 
 # 业务失败
@@ -17,22 +17,22 @@ async def business_error(request, exc):
         request.method, request.url.path, exc.code, exc.msg,
     )
     # 前端通过 code 判断
-    return Response.make(exc.code, exc.msg, exc.data)
+    return fail(exc.code, exc.msg, exc.data)
 
 
 # 未登录
 async def unauthorized_error(request, exc):
-    return Response.make(401, exc.msg, None, http_status=401)
+    return fail(401, exc.msg, None, http_status=401)
 
 
 # 无权限 403
 async def forbidden_error(request, exc):
-    return Response.make(403, exc.msg, None, http_status=403)
+    return fail(403, exc.msg, None, http_status=403)
 
 
 # 路由匹配不到
 async def not_found(request, exc):
-    return Response.make(404, exc.detail, None, http_status=404)
+    return fail(404, exc.detail, None, http_status=404)
 
 
 # 唯一键/约束冲突兜底
@@ -41,7 +41,7 @@ async def integrity_conflict(request, exc):
         'integrity conflict method={} path={} code={}',
         request.method, request.url.path, BizCode.RESOURCE_CONFLICT.value,
     )
-    return Response.make(
+    return fail(
         BizCode.RESOURCE_CONFLICT,
         BizCode.RESOURCE_CONFLICT.message,
         None
@@ -59,7 +59,7 @@ async def server_error(request, exc):
     with logger.contextualize(request_id=request_id):
         logger.exception('unhandled server error path={}', request.url.path)
 
-    return Response.make(
+    return fail(
         500, '服务器内部错误',
         None,
         http_status=500,
