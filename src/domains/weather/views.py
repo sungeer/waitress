@@ -1,5 +1,3 @@
-from loguru import logger
-
 from src.core.background import background
 from src.core.codes import BizCode
 from src.core.exceptions import BusinessError
@@ -7,16 +5,6 @@ from src.core.response import ok
 from src.domains.weather import service
 from src.domains.weather.errors import UpstreamError
 from src.utils import validate
-
-
-async def _refresh_runner(cell, lat, lon):
-    try:
-        await service.refresh_cell(cell, lat, lon)
-    except UpstreamError as exc:
-        logger.warning(
-            'weather background refresh done cell={} err={}',
-            cell, exc
-        )
 
 
 async def weather_get(request):
@@ -42,6 +30,6 @@ async def weather_get(request):
     data = service.to_data(snap, now_time)
 
     if not data['fresh'] and service.should_attempt(snap, now_time):
-        background.spawn(_refresh_runner(cell, lat_r, lon_r))
+        background.spawn(service.refresh_runner(cell, lat_r, lon_r))
 
     return ok(data)

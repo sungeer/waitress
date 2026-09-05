@@ -168,3 +168,16 @@ async def refresh_cell(cell: str, lat: float, lon: float) -> dict:
         if refreshed is None:
             raise UpstreamError('snapshot missing right after store')
         return refreshed
+
+
+async def refresh_runner(cell: str, lat: float, lon: float) -> None:
+    """供 background.spawn 调用的静默刷新
+    吞掉预期的 UpstreamError，避免后台任务产生未处理异常
+    """
+    try:
+        await refresh_cell(cell, lat, lon)
+    except UpstreamError as exc:
+        logger.warning(
+            'weather background refresh done cell={} err={}',
+            cell, exc
+        )
