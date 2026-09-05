@@ -136,14 +136,16 @@ async def _fetch_current(cell: str, lat: float, lon: float) -> dict:
     return payload
 
 
+# from db data
 async def get_snapshot(cell: str) -> dict | None:
     return await _read_snapshot(cell)
 
 
 async def refresh_cell(cell: str, lat: float, lon: float) -> dict:
-    """单飞刷新：并发调用同一格点时只有一个真正打上游。
-
-    锁内重读避免重复刷新；拿到锁后若已新鲜或仍在退避冷却则直接返回。
+    """单飞刷新
+    并发调用同一格点时只有一个真正打上游
+    锁内重读避免重复刷新
+    拿到锁后若已新鲜或仍在退避冷却则直接返回
     """
     async with _lock_for(cell):
         snap = await _read_snapshot(cell)

@@ -13,7 +13,10 @@ async def _refresh_runner(cell, lat, lon):
     try:
         await service.refresh_cell(cell, lat, lon)
     except UpstreamError as exc:
-        logger.warning('weather background refresh done cell={} err={}', cell, exc)
+        logger.warning(
+            'weather background refresh done cell={} err={}',
+            cell, exc
+        )
 
 
 async def weather_get(request):
@@ -26,7 +29,7 @@ async def weather_get(request):
     lon_r = service.round_coord(lon)
     cell = service.cell_of(lat_r, lon_r)
 
-    snap = await service.get_snapshot(cell)
+    snap = await service.get_snapshot(cell)  # db data
     now_time = service.now()
 
     if snap is None:
