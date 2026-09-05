@@ -10,7 +10,6 @@ from src.utils import validate
 
 
 async def _refresh_runner(cell, lat, lon):
-    # 后台刷新失败已在 service 记录并退避，这里吞掉以免后台任务异常告警
     try:
         await service.refresh_cell(cell, lat, lon)
     except UpstreamError as exc:
@@ -31,7 +30,6 @@ async def weather_get(request):
     now_time = service.now()
 
     if snap is None:
-        # 冷查：本格从无缓存，只能同步拉一次；上游不可达 → 显式业务失败
         try:
             snap = await service.refresh_cell(cell, lat_r, lon_r)
         except UpstreamError:
