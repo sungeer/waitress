@@ -49,3 +49,17 @@ INSERT INTO users (username, display_name, email) VALUES
     ('bob',   '鲍勃',   'bob@example.com'),
     ('carol', '卡罗尔', 'carol@example.com');
 
+
+CREATE TABLE weather_snapshots (
+    cell                 VARCHAR(32)  NOT NULL                COMMENT '格点 key，经纬度保留一位小数，如 39.9,116.4',
+    payload              JSON         NOT NULL                COMMENT 'open-meteo current_weather 原始对象',
+    fetched_at           DATETIME     NOT NULL                COMMENT '本服务成功拉取时间（新鲜度锚点）',
+    consecutive_failures INT          NOT NULL DEFAULT 0      COMMENT '连续失败次数，成功后清零',
+    last_error           VARCHAR(255) NULL                    COMMENT '最近一次失败原因',
+    next_retry_at        DATETIME     NULL                    COMMENT '退避后可再次尝试的时刻',
+    PRIMARY KEY (cell)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='天气格点快照表';
+

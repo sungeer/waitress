@@ -79,3 +79,17 @@ def optional_str(data, key, default=None):
     if not value.strip():
         raise BusinessError(BizCode.PARAM_ERROR, f'{key} cannot be empty')
     return value
+
+
+def require_float_in(data, key, low, high):
+    # 数值(含字符串"39.9")在 [low, high] 区间内才放行，返回 float
+    value = data.get(key)
+    if value is None:
+        raise BusinessError(BizCode.PARAM_MISSING, f'{key} is required')
+    try:
+        num = float(value)
+    except (TypeError, ValueError):
+        raise BusinessError(BizCode.PARAM_TYPE_ERROR, f'{key} must be a number')
+    if not low <= num <= high:
+        raise BusinessError(BizCode.PARAM_OUT_OF_RANGE, f'{key} out of range [{low}, {high}]')
+    return num

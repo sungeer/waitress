@@ -3,10 +3,14 @@ from starlette.routing import Route
 from src.domains.health import views as health_views
 from src.domains.tasks import views as task_views
 from src.domains.users import views as user_views
+from src.domains.weather import views as weather_views
 
 routes = [
     # 健康检查
     Route('/healthz.liveness', health_views.liveness, methods=['GET']),
+
+    # 天气 格点快照(带单飞刷新与降级)
+    Route('/weather.get', weather_views.weather_get, methods=['POST']),
 
     # 任务
     Route('/tasks.count', task_views.background_count, methods=['GET']),
