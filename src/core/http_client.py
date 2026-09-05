@@ -1,6 +1,10 @@
 import httpx2
 
 
+# 统一暴露传输层错误，供上层捕获，避免各域直接依赖具体 HTTP 包
+HTTPError = httpx2.HTTPError
+
+
 class _AsyncClientHolder:
 
     def __init__(self):

@@ -1,12 +1,11 @@
 import asyncio
 from datetime import datetime, timedelta
 
-import httpx2
 from loguru import logger
 
 from src.core.db_registry import db
 from src.core.executor import executor
-from src.core.http_client import httpx
+from src.core.http_client import httpx, HTTPError
 from src.domains.weather import repository
 from src.domains.weather.errors import UpstreamError
 from src.utils.concurrency import run_in_threadpool
@@ -158,7 +157,7 @@ async def refresh_cell(cell: str, lat: float, lon: float) -> dict:
 
         try:
             payload = await _fetch_current(cell, lat, lon)
-        except httpx2.HTTPError as exc:
+        except HTTPError as exc:
             if snap:
                 await _record_failure(snap, cell, str(exc))
             raise UpstreamError(f'open-meteo fetch failed: {exc}') from exc
