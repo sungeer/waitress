@@ -9,7 +9,7 @@ routes = [
     # 健康检查
     Route('/healthz.liveness', health_views.liveness, methods=['GET']),
 
-    # 天气 格点快照(带单飞刷新与降级)
+    # 天气 格点快照
     Route('/weather.get', weather_views.weather_get, methods=['POST']),
 
     # 任务
