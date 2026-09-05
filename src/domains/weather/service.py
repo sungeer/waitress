@@ -58,13 +58,14 @@ def to_data(snap: dict, now_time: datetime) -> dict:
     age_s = int((now_time - fetched_at).total_seconds())
     degraded = (not fresh) and snap.get('consecutive_failures', 0) >= DEGRADE_AFTER_FAILURES
 
-    data = dict(snap['payload'])
-    data.update({
+    data = dict(snap['payload'])  # 浅拷贝 dict({'a': 'qaz'})
+    meta = {
         'cell': snap['cell'],
         'fresh': fresh,
         'age_s': age_s,
         'degraded': degraded,
-    })
+    }
+    data.update(meta)
     return data
 
 
