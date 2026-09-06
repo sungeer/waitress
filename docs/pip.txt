@@ -9,17 +9,18 @@ pip install -r requirements.txt
 pip uninstall asyncmy
 
 
-
-python -m pip install starlette uvicorn
-
+# 开发环境
+python -m pip install starlette
 python -m pip install loguru httpx2 cryptography
-
 python -m pip install sqlalchemy PyMySQL
+python -m pip install PyJWT pydantic
+python -m pip install python-dotenv
+python -m pip install uvicorn
 
-python -m pip install PyJWT python-dotenv pydantic
 
-
-# prod gunicorn
+# 生成环境
+python -m pip install 'uvicorn[standard]'
+python -m pip install gunicorn
 python -m pip install uvicorn-worker
 
 
