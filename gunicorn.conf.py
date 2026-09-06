@@ -8,6 +8,6 @@ chdir = '/srv/waitress'
 pidfile = '/srv/run/waitress.pid'
 
 workers = 1
-worker_class = 'uvicorn_worker.UvicornWorker'
+worker_class = 'uvicorn_worker.UvicornWorker'  # pip install uvicorn-worker
 
 errorlog = '/srv/logs/gunicorn.log'
