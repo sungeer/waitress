@@ -125,10 +125,16 @@ async def _fetch_current(cell: str, lat: float, lon: float) -> dict:
         'current_weather': 'true',
     }
     client = httpx.get()
-    resp = await client.get(_FORECAST_URL, params=params)
-    resp.raise_for_status()
+    try:
+        resp = await client.get(_FORECAST_URL, params=params)
+        resp.raise_for_status()
+        body = resp.json()
+    except (HTTPError, ValueError) as exc:
+        raise UpstreamError(f'open-meteo fetch failed: {exc}') from exc
 
-    payload = resp.json().get('current_weather')
+    if not isinstance(body, dict):
+        raise UpstreamError('unexpected open-meteo payload shape')
+    payload = body.get('current_weather')
     if not isinstance(payload, dict):
         raise UpstreamError('unexpected open-meteo payload')
 
@@ -161,10 +167,11 @@ async def refresh_cell(cell: str, lat: float, lon: float) -> dict:
 
         try:
             payload = await _fetch_current(cell, lat, lon)
-        except HTTPError as exc:
+        except UpstreamError as exc:
+            # 传输失败与畸形响应已统一由 _fetch_current 翻成 UpstreamError
             if snap:
                 await _record_failure(snap, cell, str(exc))
-            raise UpstreamError(f'open-meteo fetch failed: {exc}') from exc
+            raise
 
         await _store_success(cell, payload, snap is not None)
         refreshed = await _read_snapshot(cell)

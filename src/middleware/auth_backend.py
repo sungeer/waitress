@@ -40,7 +40,7 @@ class JWTAuthBackend(AuthenticationBackend):
         except AuthenticationError as e:
             logger.warning('JWT auth failed error={} path={}', e, conn.url.path)
             raise
-        except Exception:
+        except ValueError:
             logger.warning('JWT token parse failed path={}', conn.url.path)
             raise AuthenticationError('JWT token parse failed')
 
