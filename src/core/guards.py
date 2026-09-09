@@ -1,6 +1,6 @@
 import functools
 
-from src.core.exceptions import UnauthorizedError, ForbiddenError
+from src.utils.exceptions import UnauthorizedError, ForbiddenError
 
 
 # 登录校验

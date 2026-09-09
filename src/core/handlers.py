@@ -1,8 +1,8 @@
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
-from src.core.codes import BizCode
-from src.core.exceptions import (
+from src.utils.codes import BizCode
+from src.utils.exceptions import (
     BusinessError,
     UnauthorizedError,
     ForbiddenError

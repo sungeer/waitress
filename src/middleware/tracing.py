@@ -3,7 +3,7 @@ import time
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from src.core.context import new_request_id
+from src.utils.context import new_request_id
 
 
 class RequestIdMiddleware(BaseHTTPMiddleware):

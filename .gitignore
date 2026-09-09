@@ -170,4 +170,5 @@ uploads/*
 data/*
 !data/.gitkeep
 CLAUDE.md
+CLAUDE.local.md
 .claudeignore
