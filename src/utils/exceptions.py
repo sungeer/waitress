@@ -1,3 +1,8 @@
+"""应用层 HTTP 异常
+用于"请求-响应"流程
+"""
+
+
 class AppError(Exception):
     """所有应用异常的基类"""
     pass
