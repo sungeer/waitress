@@ -35,6 +35,11 @@ async def not_found(request, exc):
     return fail(404, exc.detail, None, http_status=404)
 
 
+# 方法不对
+async def method_not_allowed(request, exc):
+    return fail(405, exc.detail, None, http_status=405)
+
+
 # 唯一键/约束冲突兜底
 async def integrity_conflict(request, exc):
     logger.warning(
@@ -69,10 +74,10 @@ async def server_error(request, exc):
 
 exception_handlers = {
     404: not_found,  # 整数键 由 Starlette 内部触发
-    500: server_error,  # raise HTTPException(status_code=500, detail='something wrong') 触发
+    405: method_not_allowed,  # 整数键 方法不对
     BusinessError: business_error,  # 类键
     UnauthorizedError: unauthorized_error,
     ForbiddenError: forbidden_error,
     IntegrityError: integrity_conflict,  # 唯一键/约束冲突兜底（预检漏网的竞态等）
-    Exception: server_error,  # 必须放最后 处理所有没被预料到的 Python 异常
+    Exception: server_error,  # 处理所有没被预料到的 Python 异常
 }
