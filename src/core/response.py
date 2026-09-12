@@ -19,11 +19,17 @@ class ApiResponse(JSONResponse):
         ).encode('utf-8')
 
 
-def ok(data=None, msg='success'):
+def ok(data: Any = None, msg: str = 'success') -> ApiResponse:
     return ApiResponse({'code': 0, 'msg': msg, 'data': data})
 
 
-def fail(code, msg, data=None, http_status=200, headers=None):
+def fail(
+    code: int,
+    msg: str,
+    data: Any = None,
+    http_status: int = 200,
+    headers: dict | None = None
+) -> ApiResponse:
     return ApiResponse(
         {'code': code, 'msg': msg, 'data': data},
         status_code=http_status,

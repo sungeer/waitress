@@ -9,7 +9,9 @@ from src.core.executor import executor
 from src.core.http_client import httpx, HTTPError
 from src.domains.weather import repository
 from src.domains.weather.errors import UpstreamError
+from src.utils.codes import BizCode
 from src.utils.concurrency import run_in_threadpool
+from src.utils.exceptions import BusinessError
 
 # 快照新鲜度：与 open-meteo 约 15 分钟一更的节奏对齐
 SNAPSHOT_TTL_SECONDS = 900
@@ -191,3 +193,16 @@ async def refresh_runner(cell: str, lat: float, lon: float) -> None:
             'weather background refresh done cell={} err={}',
             cell, exc
         )
+
+
+async def get_or_refresh(cell: str, lat: float, lon: float) -> dict:
+    """请求路径入口：无快照则同步刷新
+    上游不可用时翻成业务错误，由 core.handlers 统一出参
+    """
+    snap = await get_snapshot(cell)
+    if snap is not None:
+        return snap
+    try:
+        return await refresh_cell(cell, lat, lon)
+    except UpstreamError as exc:
+        raise BusinessError(BizCode.UPSTREAM_UNAVAILABLE) from exc
