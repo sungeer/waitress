@@ -26,11 +26,11 @@ python -m pip install uvicorn-worker
 
 
 
-uvicorn app:app --host 0.0.0.0 --port 8000
+uvicorn app:app --host 0.0.0.0 --port 8848
 
 
 
-uvicorn app:app --host 0.0.0.0 --port 8000 --env-file /home/user/waitress-testing.env
+uvicorn app:app --host 0.0.0.0 --port 8848 --env-file /home/user/waitress-testing.env
 
 
 nohup /srv/venvs/waitress/bin/gunicorn -c /srv/waitress/gunicorn.conf.py main:app > /dev/null 2>&1 &
