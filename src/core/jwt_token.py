@@ -36,14 +36,14 @@ def _decode_token(token: str):
             algorithms=[settings.JWT_ALGORITHM],
         )
     except ExpiredSignatureError:
-        raise AuthenticationError('JWT Token 已过期')
+        raise AuthenticationError('JWT token expired')
     except InvalidTokenError:
-        raise AuthenticationError('JWT Token 非法或格式错误')
+        raise AuthenticationError('JWT token invalid or malformed')
 
 
 # 验证 Access Token 并返回 payload
 def verify_access_token(token: str):
     payload = _decode_token(token)
     if payload.get('type') != 'access':
-        raise AuthenticationError('JWT Token 类型不符')
+        raise AuthenticationError('JWT token type mismatch')
     return payload

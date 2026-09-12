@@ -22,7 +22,7 @@ def permission_required(scope):
             if not request.user.is_authenticated:
                 raise UnauthorizedError()
             if scope not in request.auth.scopes:
-                raise ForbiddenError(f'需要[{scope}]权限')
+                raise ForbiddenError(f'permission denied: requires scope [{scope}]')
             return await func(request, *args, **kwargs)
 
         return wrapper

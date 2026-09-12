@@ -1,3 +1,5 @@
+from sqlalchemy.exc import IntegrityError
+
 from src.utils.exceptions import BusinessError
 from src.utils.codes import BizCode
 from src.core.executor import executor
@@ -32,11 +34,18 @@ async def create_user(username: str, display_name: str | None, email: str) -> in
     def run_sync():
         with db.connect() as conn:
             if repository.username_exists(conn, username):
-                raise BusinessError(BizCode.USER_ALREADY_EXISTS, '用户名已存在')
+                raise BusinessError(BizCode.USER_ALREADY_EXISTS, 'username already exists')
             if repository.email_exists(conn, email):
-                raise BusinessError(BizCode.USER_ALREADY_EXISTS, '邮箱已存在')
-            new_id = repository.insert_user(conn, username, display_name, email)
-            conn.commit()
+                raise BusinessError(BizCode.USER_ALREADY_EXISTS, 'email already exists')
+            try:
+                new_id = repository.insert_user(conn, username, display_name, email)
+                conn.commit()
+            except IntegrityError as exc:
+                # 预检漏网的竞态：唯一键是权威判据，翻成业务错误
+                raise BusinessError(
+                    BizCode.USER_ALREADY_EXISTS,
+                    'username or email already exists'
+                ) from exc
             return new_id
 
     user_id = await run_in_threadpool(executor.db, run_sync)

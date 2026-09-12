@@ -1,7 +1,5 @@
 from loguru import logger
-from sqlalchemy.exc import IntegrityError
 
-from src.utils.codes import BizCode
 from src.utils.exceptions import (
     BusinessError,
     UnauthorizedError,
@@ -22,6 +20,7 @@ async def business_error(request, exc):
 
 # 未登录
 async def unauthorized_error(request, exc):
+    # return fail(exc.code, exc.msg, None, http_status=exc.http_status)
     return fail(401, exc.msg, None, http_status=401)
 
 
@@ -40,19 +39,6 @@ async def method_not_allowed(request, exc):
     return fail(405, exc.detail, None, http_status=405)
 
 
-# 唯一键/约束冲突兜底
-async def integrity_conflict(request, exc):
-    logger.warning(
-        'integrity conflict method={} path={} code={}',
-        request.method, request.url.path, BizCode.RESOURCE_CONFLICT.value,
-    )
-    return fail(
-        BizCode.RESOURCE_CONFLICT,
-        BizCode.RESOURCE_CONFLICT.message,
-        None
-    )
-
-
 # 内部错误 500
 async def server_error(request, exc):
     """兜底处理
@@ -65,7 +51,7 @@ async def server_error(request, exc):
         logger.exception('unhandled server error path={}', request.url.path)
 
     return fail(
-        500, '服务器内部错误',
+        500, 'internal server error',
         None,
         http_status=500,
         headers={'X-Request-ID': request_id}
@@ -78,6 +64,5 @@ exception_handlers = {
     BusinessError: business_error,  # 类键
     UnauthorizedError: unauthorized_error,
     ForbiddenError: forbidden_error,
-    IntegrityError: integrity_conflict,  # 唯一键/约束冲突兜底（预检漏网的竞态等）
     Exception: server_error,  # 处理所有没被预料到的 Python 异常
 }
