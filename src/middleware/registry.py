@@ -14,6 +14,7 @@ middleware = [
         allow_credentials=True,
         allow_methods=['*'],  # 允许所有方法
         allow_headers=['*'],  # 允许所有头部
+        expose_headers=['X-Request-ID'],  # 跨源时允许前端 JS 读取该响应头
     ),
     Middleware(
         AuthenticationMiddleware,
