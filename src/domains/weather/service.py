@@ -138,6 +138,7 @@ async def _fetch_current(cell: str, lat: float, lon: float) -> dict:
 
     if not isinstance(body, dict):
         raise UpstreamError('unexpected open-meteo payload shape')
+
     payload = body.get('current_weather')
     if not isinstance(payload, dict):
         raise UpstreamError('unexpected open-meteo payload')
