@@ -5,10 +5,10 @@
 grep -n -e "- ERROR" waitress.log
 
 -- 同时满足
-grep -n -e "- ERROR" waitress.log | grep "0916"
+grep -n -e "- ERROR" waitress.log | grep "2026-09-02"
 
 -- 任有其一
-grep -n -e "- ERROR" -e "0916" waitress.log
+grep -n -e "- ERROR" -e "2026-09-02" waitress.log
 
 
 -- 定位到指定行
