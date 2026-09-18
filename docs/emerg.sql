@@ -2,13 +2,13 @@
 
 
 -- 查看有哪些行号符合
-grep -n -e "- ERROR" waitress.log
+grep -n -F "- ERROR" waitress.log
 
 -- 同时满足
-grep -n -e "- ERROR" waitress.log | grep "2026-09-02"
+grep -n -F "- ERROR" waitress.log | grep "2026-09-02"
 
 -- 任有其一
-grep -n -e "- ERROR" -e "2026-09-02" waitress.log
+grep -n -F -e "- ERROR" -e "2026-09-02" waitress.log
 
 
 -- 定位到指定行
