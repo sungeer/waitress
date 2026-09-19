@@ -4,19 +4,30 @@ from loguru import logger
 
 from src import settings
 
+_LEVEL_ABBR = {
+    'TRACE': 'TRC',
+    'DEBUG': 'DBG',
+    'INFO': 'INF',
+    'SUCCESS': 'SUC',
+    'WARNING': 'WRN',
+    'ERROR': 'ERR',
+    'CRITICAL': 'CRT'
+}
 
-def _inject_request_id(record):
+
+def _patch_record(record):
     record['extra'].setdefault('request_id', '-')
+    record['level'].name = _LEVEL_ABBR.get(record['level'].name, record['level'].name)
 
 
 def setup_logger():
     logger.remove()
 
-    logger.configure(patcher=_inject_request_id)
+    logger.configure(patcher=_patch_record)
 
     fmt = (
-        '{time:YYYY-MM-DD HH:mm:ss.SSS} - [{extra[request_id]}] - {level} - '
-        '{name}:{function}:{line} - {message}'
+        '{time:HH:mm:ss.SSS} - [{extra[request_id]}] - {level} - '
+        '{message} - {name}:{function}:{line}'
     )
 
     if settings.ENVIRONMENT == 'development':
