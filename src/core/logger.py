@@ -26,8 +26,8 @@ def setup_logger():
     logger.configure(patcher=_patch_record)
 
     fmt = (
-        '{time:HH:mm:ss.SSS} - [{extra[request_id]}] - {level} - '
-        '{message} - {name}:{function}:{line}'
+        '{time:HH:mm:ss.SSS} | {extra[request_id]} | {level} | '
+        '{message} @ {name}:{function}:{line}'
     )
 
     if settings.ENVIRONMENT == 'development':

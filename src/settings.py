@@ -32,7 +32,7 @@ if ENVIRONMENT not in _ENVIRONMENTS:
 LOG_DIR = Path(os.getenv('LOG_DIR', default=str(BASE_DIR / 'logs')))
 
 # 应用版本
-VERSION = '26.0916.0834'
+VERSION = '26.0919.2028'
 
 # JWT
 JWT_ALGORITHM = 'HS256'  # 加密算法
