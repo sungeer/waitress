@@ -30,8 +30,10 @@ def setup_logger():
             level='INFO',
         )
 
+    log_file = settings.LOG_DIR / 'waitress_{time:YYYY-MM-DD}.log'
+
     logger.add(
-        settings.LOG_FILE,
+        log_file,
         format=fmt,
         diagnose=False,
         backtrace=False,
@@ -39,6 +41,6 @@ def setup_logger():
         enqueue=True,
         level='INFO',
         encoding='utf-8',
-        rotation='200 MB',
-        retention=2,
+        rotation='00:00',
+        retention='14 days',
     )
