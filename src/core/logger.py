@@ -27,7 +27,7 @@ def setup_logger():
 
     fmt = (
         '{time:HH:mm:ss.SSS} | {extra[request_id]} | {level} | '
-        '{message} @ {name}:{function}:{line}'
+        '{message} ({name}:{line})'
     )
 
     if settings.ENVIRONMENT == 'development':
