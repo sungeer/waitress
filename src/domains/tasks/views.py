@@ -8,8 +8,6 @@ from src.core.background import background
 
 # 后台任务观测
 async def background_count(request):
-    _ = request
-
     data = {
         'count': background.count
     }
