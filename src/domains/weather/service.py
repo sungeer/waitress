@@ -6,8 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from src.core.db_registry import db
 from src.core.executor import executor
-from src.core.http_client import httpx, HTTPError, Timeout
-from src.domains.weather import repository
+from src.domains.weather import repository, upstream
 from src.domains.weather.errors import UpstreamError
 from src.utils.codes import BizCode
 from src.utils.concurrency import run_in_threadpool
@@ -22,8 +21,6 @@ DEGRADE_AFTER_FAILURES = 3
 # 失败退避：30s * 2^(n-1)，封顶 1 小时
 _BACKOFF_BASE_SECONDS = 30
 _BACKOFF_CAP_SECONDS = 3600
-
-_FORECAST_URL = 'https://api.open-meteo.com/v1/forecast'
 
 
 # 每格点一个进程内 asyncio.Lock，保证单飞。字典按"请求过的格点"增长，量级远小于
@@ -119,37 +116,6 @@ async def _record_failure(snap: dict, cell: str, error: str):
     await run_in_threadpool(executor.db, run_sync)
 
 
-# 查询天气
-async def _fetch_current(cell: str, lat: float, lon: float) -> dict:
-    params = {
-        'latitude': lat,
-        'longitude': lon,
-        'current_weather': 'true',
-    }
-    client = httpx.get()
-    timeout = Timeout(connect=3.0, read=15.0, write=5.0, pool=5.0)
-    try:
-        # await client.get(url, timeout=20)
-        resp = await client.get(_FORECAST_URL, params=params, timeout=timeout)
-        resp.raise_for_status()
-        body = resp.json()
-    except (HTTPError, ValueError) as exc:
-        raise UpstreamError(f'open-meteo fetch failed: {exc}') from exc
-
-    if not isinstance(body, dict):
-        raise UpstreamError('unexpected open-meteo payload shape')
-
-    payload = body.get('current_weather')
-    if not isinstance(payload, dict):
-        raise UpstreamError('unexpected open-meteo payload')
-
-    logger.info(
-        'weather fetch upstream cell={} lat={} lon={}',
-        cell, lat, lon
-    )
-    return payload
-
-
 # from db data
 async def get_snapshot(cell: str) -> dict | None:
     return await _read_snapshot(cell)
@@ -171,9 +137,9 @@ async def refresh_cell(cell: str, lat: float, lon: float) -> dict:
             return snap
 
         try:
-            payload = await _fetch_current(cell, lat, lon)
+            payload = await upstream.fetch_current(cell, lat, lon)
         except UpstreamError as exc:
-            # 传输失败与畸形响应已统一由 _fetch_current 翻成 UpstreamError
+            # 传输失败与畸形响应已统一由 upstream.fetch_current 翻成 UpstreamError
             if snap:
                 await _record_failure(snap, cell, str(exc))
             raise
