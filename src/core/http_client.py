@@ -32,7 +32,7 @@ class _AsyncClientHolder:
             verify=False,
         )
 
-    def get(self):
+    def get_client(self):
         if self._client is None:
             raise RuntimeError('HTTP client not initialized')
         return self._client

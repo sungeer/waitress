@@ -12,7 +12,7 @@ async def fetch_current(cell: str, lat: float, lon: float) -> dict:
         'longitude': lon,
         'current_weather': 'true',
     }
-    client = httpx.get()
+    client = httpx.get_client()
     timeout = Timeout(connect=3.0, read=15.0, write=5.0, pool=5.0)
     try:
         # await client.get(url, timeout=20)
