@@ -1,6 +1,6 @@
 import httpx2 as httpx
 
-BASE_URL = 'http://127.0.0.1:8000'
+BASE_URL = 'http://127.0.0.1:8848'
 
 
 def list_users(limit: int = 10):

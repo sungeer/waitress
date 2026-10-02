@@ -4,6 +4,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy.engine import URL
 
+# 应用版本
+VERSION = '26.1002.1001'
+
 # 项目根目录
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,9 +33,6 @@ if ENVIRONMENT not in _ENVIRONMENTS:
 # 日志
 # LOG_FILE = BASE_DIR / 'logs/waitress.log'
 LOG_DIR = Path(os.getenv('LOG_DIR', default=str(BASE_DIR / 'logs')))
-
-# 应用版本
-VERSION = '26.0927.1609'
 
 # JWT
 JWT_ALGORITHM = 'HS256'  # 加密算法
