@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from sqlalchemy.engine import URL
 
 # 应用版本
-VERSION = '26.1003.0729'
+VERSION = '26.1003.0741'
 
 # 项目根目录
 BASE_DIR = Path(__file__).resolve().parent.parent

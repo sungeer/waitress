@@ -29,6 +29,9 @@ PYTHONUTF8=1
 
 uvicorn app:app --host 0.0.0.0 --port 8848
 
+# dev 保留启动错误信息 关闭 HTTP 请求的日志
+uvicorn app:app --host 0.0.0.0 --port 8848 --no-access-log
+
 
 
 uvicorn app:app --host 0.0.0.0 --port 8848 --env-file /home/user/waitress-testing.env
