@@ -7,7 +7,7 @@ from src.core.background import background
 
 
 # 后台任务观测
-async def background_count(request):
+async def background_count(request):  # noqa
     data = {
         'count': background.count
     }
