@@ -2,6 +2,7 @@ import time
 
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import ClientDisconnect
 
 from src.utils.request_id import new_request_id
 
@@ -16,10 +17,16 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         start = time.perf_counter()
 
         with logger.contextualize(request_id=request_id):
-            status = 500  # 默认值：未处理异常统一按 500 收尾
+            status = 0  # 未产生状态码: 客户端断开 或 任务被取消
             try:
                 response = await call_next(request)
                 status = response.status_code
+            except ClientDisconnect:
+                status = 499  # 客户端在响应前断开
+                raise
+            except Exception:
+                status = 500  # 未处理异常
+                raise
             finally:
                 elapsed_ms = round((time.perf_counter() - start) * 1000)
                 logger.info(

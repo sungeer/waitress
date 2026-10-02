@@ -1,4 +1,5 @@
 from loguru import logger
+from starlette.requests import ClientDisconnect
 
 from src.utils.exceptions import (
     BusinessError,
@@ -39,6 +40,11 @@ async def method_not_allowed(request, exc):
     return fail(405, exc.detail, None, http_status=405)
 
 
+# 客户端中途断开
+async def client_disconnect(request, exc):
+    return fail(499, 'client closed request', None, http_status=499)
+
+
 # 内部错误 500
 async def server_error(request, exc):
     """兜底处理
@@ -64,5 +70,6 @@ exception_handlers = {
     BusinessError: business_error,  # 类键
     UnauthorizedError: unauthorized_error,
     ForbiddenError: forbidden_error,
+    ClientDisconnect: client_disconnect,
     Exception: server_error,  # 处理所有没被预料到的 Python 异常
 }
