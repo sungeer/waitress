@@ -4,6 +4,7 @@ from src.domains.health import views as health_views
 from src.domains.tasks import views as task_views
 from src.domains.users import views as user_views
 from src.domains.weather import views as weather_views
+from src.domains.chat import views as chat_views
 
 routes = [
     # 健康检查
@@ -22,4 +23,7 @@ routes = [
     Route('/users.create', user_views.create_user, methods=['POST']),
     Route('/users.update', user_views.update_display_name, methods=['POST']),
     Route('/users.delete', user_views.delete_user, methods=['POST']),
+
+    Route('/agent.stream', chat_views.stream, methods=['POST']),
+    Route('/agent.ask', chat_views.ask, methods=['POST']),
 ]
