@@ -1,4 +1,5 @@
 from starlette.responses import StreamingResponse
+from loguru import logger
 
 from src.domains.chat import service
 from src import settings
@@ -30,10 +31,7 @@ async def ask(request):
         'Content-Type': 'application/json'
     }
 
-    user_prompt = (
-        'Which is the longest river in the world? '
-        'The Nile River.'
-    )
+    user_prompt = 'Hello!'
 
     payload = {
         'model': settings.LLM_MODEL,
@@ -45,10 +43,12 @@ async def ask(request):
         'thinking': {'type': 'disabled'}
     }
 
-    client = httpx.get()
+    client = httpx.get_client()
     response = await client.post(url, headers=headers, json=payload)
     response.raise_for_status()  # 检查 HTTP 错误
     data = response.json()
+
+    logger.info('llm response data={}', data)
+
     content = data['choices'][0]['message']['content']
-    output = serial.from_json(content)
-    return ok(output)
+    return ok(content)

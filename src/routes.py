@@ -24,6 +24,6 @@ routes = [
     Route('/users.update', user_views.update_display_name, methods=['POST']),
     Route('/users.delete', user_views.delete_user, methods=['POST']),
 
-    Route('/agent.stream', chat_views.stream, methods=['POST']),
-    Route('/agent.ask', chat_views.ask, methods=['POST']),
+    Route('/chat.stream', chat_views.stream, methods=['POST']),
+    Route('/chat.ask', chat_views.ask, methods=['POST']),
 ]
