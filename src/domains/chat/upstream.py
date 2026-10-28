@@ -28,16 +28,55 @@ async def complete() -> str:
         response = await client.post(url, headers=headers, json=payload)
         response.raise_for_status()
         data = response.json()
-    except (HTTPError, ValueError) as exc:
-        raise UpstreamError(f'llm completion failed: {exc}') from exc
+    except (HTTPError, ValueError):
+        logger.exception(
+            'llm request failed, url={}, payload={}',
+            url, payload
+        )
+        raise UpstreamError('llm request failed')
 
     logger.info('llm response data={}', data)
 
-    try:
-        content = data['choices'][0]['message']['content']
-    except (KeyError, IndexError, TypeError) as exc:
-        raise UpstreamError('unexpected llm payload') from exc
+    if not isinstance(data, dict):
+        logger.error(
+            'llm response data is not a dict, type={}, data={}',
+            type(data).__name__, data
+        )
+        raise UpstreamError('data type is incorrect')
 
+    choices = data.get('choices')
+    if not isinstance(choices, list):
+        logger.error(
+            'llm response choices is not a list, type={}, choices={}',
+            type(choices).__name__, choices
+        )
+        raise UpstreamError('choices type is incorrect')
+
+    if not choices:
+        logger.error('llm response choices is empty')
+        raise UpstreamError('choices is empty')
+
+    choice, *_ = choices
+    if not isinstance(choice, dict):
+        logger.error(
+            'llm response choice is not a dict, type={}, choice={}',
+            type(choice).__name__, choice
+        )
+        raise UpstreamError('choice type is incorrect')
+
+    message = choice.get('message')
+    if not isinstance(message, dict):
+        logger.error(
+            'llm response message is not a dict, type={}, message={}',
+            type(message).__name__, message
+        )
+        raise UpstreamError('message type is incorrect')
+
+    content = message.get('content')
     if not isinstance(content, str):
-        raise UpstreamError('unexpected llm payload')
+        logger.error(
+            'llm response content is not a str, type={}, content={}',
+            type(content).__name__, content
+        )
+        raise UpstreamError('content type is incorrect')
     return content
