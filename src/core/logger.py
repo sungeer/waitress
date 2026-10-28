@@ -4,7 +4,7 @@ from loguru import logger
 
 from src import settings
 
-_LEVEL_ABBR = {
+_level_abbr = {
     'TRACE': 'TRC',
     'DEBUG': 'DBG',
     'INFO': 'INF',
@@ -17,7 +17,7 @@ _LEVEL_ABBR = {
 
 def _patch_record(record):
     record['extra'].setdefault('request_id', '-')
-    record['level'].name = _LEVEL_ABBR.get(record['level'].name, record['level'].name)
+    record['level'].name = _level_abbr.get(record['level'].name, record['level'].name)
 
 
 def setup_logger():

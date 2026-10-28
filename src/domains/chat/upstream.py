@@ -85,7 +85,6 @@ async def complete() -> str:
 
 
 async def structured():
-
     url = 'https://api.deepseek.com/chat/completions'
 
     headers = {
