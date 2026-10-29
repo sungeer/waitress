@@ -47,12 +47,9 @@ structured_system_prompt = textwrap.dedent('''
     
     # 示例
     **输入：**
-    ```text
     你好，我叫李四，电话13900139000，要1台iPad，单价5000元，不急。
-    ```
     
     **输出：**
-    ```json
     {
       "customer_name": "李四",
       "phone": "13900139000",
@@ -66,5 +63,4 @@ structured_system_prompt = textwrap.dedent('''
       "total_amount": 5000.0,
       "is_urgent": false
     }
-    ```
 ''').strip()
