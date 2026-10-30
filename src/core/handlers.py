@@ -18,7 +18,8 @@ async def business_error(request, exc):
         request.method, request.url.path, exc.msg,
     )
     # 前端通过 HTTP 状态 + success 判断
-    return fail(exc.msg)
+    # 业务拒绝是唯一允许 200 的失败场景
+    return fail(exc.msg, http_status=200)
 
 
 # 入参错误 400

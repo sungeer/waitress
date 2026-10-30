@@ -25,7 +25,7 @@ def ok(data: Any = None) -> ApiResponse:
 
 def fail(
     error: str,
-    http_status: int = 200,
+    http_status: int,
     headers: dict | None = None
 ) -> ApiResponse:
     return ApiResponse(
