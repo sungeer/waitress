@@ -6,7 +6,7 @@ from src.domains.chat import service
 
 async def stream(request):  # noqa
     return StreamingResponse(
-        service.generator(),
+        service.stream_chunks(),
         media_type='application/x-ndjson',
         headers={
             'Cache-Control': 'no-cache',

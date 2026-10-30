@@ -1,3 +1,9 @@
+from loguru import logger
+from jsonschema import validate, ValidationError
+
+from src.domains.chat.errors import UpstreamError
+
+
 structured_schema = {
     'type': 'object',
     'properties': {
@@ -21,3 +27,14 @@ structured_schema = {
     },
     'required': ['customer_name', 'phone', 'items', 'total_amount', 'is_urgent'],
 }
+
+
+def validate_struct(raw, schema):
+    try:
+        validate(raw, schema)
+    except ValidationError as e:
+        logger.error(
+            'struct validation failed, path={}, message={}, raw={}',
+            list(e.absolute_path), e.message, raw
+        )
+        raise UpstreamError('struct validation failed')

@@ -7,7 +7,7 @@ from src.utils import serial
 from src.utils.exceptions import UpstreamUnavailableError
 
 
-async def generator():
+async def stream_chunks():
     full_text = (
         '人工智能正在改变我们的世界，从语音识别到图像生成，'
         '从自动驾驶到智能推荐，它渗透进了生活的方方面面。'
