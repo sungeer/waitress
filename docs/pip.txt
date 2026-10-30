@@ -22,6 +22,8 @@ python -m pip install python-dotenv
 python -m pip install uvicorn
 python -m pip install jsonschema
 
+python -m pip install pytest
+
 
 # 生产环境
 python -m pip install 'uvicorn[standard]'
