@@ -1,11 +1,11 @@
 from loguru import logger
 
 from src.core.http_client import httpx, HTTPError, Timeout
-from src.domains.weather.errors import UpstreamError
+from src.domains.chat.errors import UpstreamError
 
 
 # 查询天气
-async def fetch_current(cell: str, lat: float, lon: float) -> dict:
+async def fetch_current(lat: float, lon: float) -> dict:
     url = 'https://api.open-meteo.com/v1/forecast'
     params = {
         'latitude': lat,
@@ -30,7 +30,7 @@ async def fetch_current(cell: str, lat: float, lon: float) -> dict:
         raise UpstreamError('unexpected open-meteo payload')
 
     logger.info(
-        'weather fetch upstream cell={} lat={} lon={}',
-        cell, lat, lon
+        'weather fetch upstream lat={} lon={}',
+        lat, lon
     )
     return payload
