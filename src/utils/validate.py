@@ -3,16 +3,16 @@ from json import JSONDecodeError
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 
-from src.utils.exceptions import BusinessError
+from src.utils.exceptions import ParamError
 
 
 async def require_body(request):
     try:
         data = await request.json()
     except JSONDecodeError:
-        raise BusinessError('request body is not valid JSON')
+        raise ParamError('request body is not valid JSON')
     if not isinstance(data, dict):
-        raise BusinessError('request body must be a JSON object')
+        raise ParamError('request body must be a JSON object')
     return data
 
 
@@ -36,16 +36,16 @@ def require_model(data: dict, model: type[BaseModel]):
             model.__name__, e
         )
         invalid_fields = _extract_invalid_fields(e)
-        raise BusinessError(f'bad request: {invalid_fields}')
+        raise ParamError(f'bad request: {invalid_fields}')
     return payload
 
 
 def require_int(data, key):
     value = data.get(key)
     if value is None:
-        raise BusinessError(f'{key} is required')
+        raise ParamError(f'{key} is required')
     if not isinstance(value, int) or isinstance(value, bool):
-        raise BusinessError(f'{key} must be an integer')
+        raise ParamError(f'{key} must be an integer')
     return value
 
 
@@ -54,18 +54,18 @@ def optional_int(data, key, default):
     if value is None:
         return default
     if not isinstance(value, int) or isinstance(value, bool):
-        raise BusinessError(f'{key} must be an integer')
+        raise ParamError(f'{key} must be an integer')
     return value
 
 
 def require_str(data, key):
     value = data.get(key)
     if value is None:
-        raise BusinessError(f'{key} is required')
+        raise ParamError(f'{key} is required')
     if not isinstance(value, str):
-        raise BusinessError(f'{key} must be a string')
+        raise ParamError(f'{key} must be a string')
     if not value.strip():
-        raise BusinessError(f'{key} cannot be empty')
+        raise ParamError(f'{key} cannot be empty')
     return value
 
 
@@ -74,9 +74,9 @@ def optional_str(data, key, default=None):
     if value is None:
         return default
     if not isinstance(value, str):
-        raise BusinessError(f'{key} must be a string')
+        raise ParamError(f'{key} must be a string')
     if not value.strip():
-        raise BusinessError(f'{key} cannot be empty')
+        raise ParamError(f'{key} cannot be empty')
     return value
 
 
@@ -84,11 +84,11 @@ def require_float_in(data, key, low, high):
     # 数值(含字符串"39.9")在 [low, high] 区间内才放行，返回 float
     value = data.get(key)
     if value is None:
-        raise BusinessError(f'{key} is required')
+        raise ParamError(f'{key} is required')
     try:
         num = float(value)
     except (TypeError, ValueError):
-        raise BusinessError(f'{key} must be a number')
+        raise ParamError(f'{key} must be a number')
     if not low <= num <= high:
-        raise BusinessError(f'{key} out of range [{low}, {high}]')
+        raise ParamError(f'{key} out of range [{low}, {high}]')
     return num

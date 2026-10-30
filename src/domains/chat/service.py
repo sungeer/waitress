@@ -4,7 +4,7 @@ import random
 from src.domains.chat import upstream
 from src.domains.chat.errors import UpstreamError
 from src.utils import serial
-from src.utils.exceptions import BusinessError
+from src.utils.exceptions import UpstreamUnavailableError
 
 
 async def generator():
@@ -31,11 +31,11 @@ async def ask() -> str:
     try:
         return await upstream.complete()
     except UpstreamError as exc:
-        raise BusinessError('upstream data source unavailable') from exc
+        raise UpstreamUnavailableError() from exc
 
 
 async def structured():
     try:
         return await upstream.structured()
     except UpstreamError as exc:
-        raise BusinessError('upstream data source unavailable') from exc
+        raise UpstreamUnavailableError() from exc

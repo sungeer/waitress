@@ -9,7 +9,7 @@ from src.core.executor import executor
 from src.domains.weather import repository, upstream
 from src.domains.weather.errors import UpstreamError
 from src.utils.concurrency import run_in_threadpool
-from src.utils.exceptions import BusinessError
+from src.utils.exceptions import UpstreamUnavailableError
 
 # 快照新鲜度：与 open-meteo 约 15 分钟一更的节奏对齐
 SNAPSHOT_TTL_SECONDS = 900
@@ -165,7 +165,7 @@ async def refresh_runner(cell: str, lat: float, lon: float) -> None:
 
 async def get_or_refresh(cell: str, lat: float, lon: float) -> dict:
     """请求路径入口：无快照则同步刷新
-    上游不可用时翻成业务错误，由 core.handlers 统一出参
+    上游不可用时翻成 503，由 core.handlers 统一出参
     """
     snap = await get_snapshot(cell)
     if snap is not None:
@@ -173,4 +173,4 @@ async def get_or_refresh(cell: str, lat: float, lon: float) -> dict:
     try:
         return await refresh_cell(cell, lat, lon)
     except UpstreamError as exc:
-        raise BusinessError('upstream data source unavailable') from exc
+        raise UpstreamUnavailableError() from exc

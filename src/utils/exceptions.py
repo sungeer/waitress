@@ -11,13 +11,31 @@ class AppError(Exception):
 class BusinessError(AppError):
     """业务失败
     HTTP 200 + success=false
-    比如 库存不足 用户状态异常 参数业务校验失败
+    比如 库存不足 用户状态异常 资源不存在
     """
     http_status = 200
 
     def __init__(self, msg: str):
         self.msg = msg
         super().__init__(self.msg)  # 让 str(exc) 有内容
+
+
+# 400 入参错误：请求本身不合法，服务端未执行业务逻辑
+class ParamError(AppError):
+    http_status = 400
+
+    def __init__(self, msg: str):
+        self.msg = msg
+        super().__init__(msg)
+
+
+# 503 上游依赖不可用
+class UpstreamUnavailableError(AppError):
+    http_status = 503
+
+    def __init__(self, msg='upstream data source unavailable'):
+        self.msg = msg
+        super().__init__(msg)
 
 
 # 401
