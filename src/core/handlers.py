@@ -35,7 +35,7 @@ async def upstream_unavailable(request, exc):
     request_id = getattr(request.state, 'request_id', '-')
 
     with logger.contextualize(request_id=request_id):
-        logger.opt(exception=exc).error('upstream unavailable, path={}', request.url.path)
+        logger.exception('upstream unavailable, path={}', request.url.path)
 
     return fail(
         exc.msg,
