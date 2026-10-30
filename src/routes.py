@@ -23,4 +23,5 @@ routes = [
     Route('/chat.stream', chat_views.stream, methods=['POST']),
     Route('/chat.ask', chat_views.ask, methods=['POST']),
     Route('/chat.structured', chat_views.structured, methods=['POST']),
+    Route('/chat.react', chat_views.react, methods=['POST']),
 ]
