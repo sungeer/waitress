@@ -1,4 +1,3 @@
-import math
 from json import JSONDecodeError
 
 from src.utils.exceptions import ParamError
@@ -32,18 +31,3 @@ def require_str(data, key):
     if not value.strip():
         raise ParamError(f'{key} cannot be empty')
     return value
-
-
-def require_number(data, key, minimum=None, maximum=None):
-    value = data.get(key)
-    if value is None:
-        raise ParamError(f'{key} is required')
-    if not isinstance(value, (int, float)) or isinstance(value, bool):
-        raise ParamError(f'{key} must be a number')
-    if not math.isfinite(value):
-        raise ParamError(f'{key} must be finite')
-    if minimum is not None and value < minimum:
-        raise ParamError(f'{key} must be >= {minimum}')
-    if maximum is not None and value > maximum:
-        raise ParamError(f'{key} must be <= {maximum}')
-    return float(value)

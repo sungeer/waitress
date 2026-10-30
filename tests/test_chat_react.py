@@ -4,8 +4,7 @@ from unittest.mock import patch
 
 from src.domains.chat import service, tools
 from src.domains.chat.errors import UpstreamError
-from src.utils import validate
-from src.utils.exceptions import ParamError, UpstreamUnavailableError
+from src.utils.exceptions import UpstreamUnavailableError
 
 
 def tool_call(call_id='call_1', arguments='{"latitude": 39.9, "longitude": 116.4}'):
@@ -50,10 +49,12 @@ class ReactServiceTest(unittest.IsolatedAsyncioTestCase):
             seen.append((messages, tools, tool_choice))
             return text_turn('今天晴。')
 
+        question = '帮我查询经纬度121.48,31.17的天气'
         with patch.object(service.upstream, 'chat', new=fake_chat):
-            answer = await service.react('天气怎么样？', 39.9, 116.4)
+            answer = await service.react(question)
 
         self.assertEqual(answer, '今天晴。')
+        self.assertEqual(seen[0][0][-1]['content'], question)
         self.assertEqual(seen[0][1], service.tools.weather_tools)
 
     async def test_executes_tool_and_returns_text(self):
@@ -72,7 +73,7 @@ class ReactServiceTest(unittest.IsolatedAsyncioTestCase):
 
         with patch.object(service.upstream, 'chat', new=fake_chat), \
                 patch.object(service.tools, 'execute', new=fake_execute):
-            answer = await service.react('天气？', 39.9, 116.4)
+            answer = await service.react('帮我查询经纬度121.48,31.17的天气')
 
         self.assertEqual(answer, '当前 20 度。')
         self.assertEqual(len(executed), 1)
@@ -99,7 +100,7 @@ class ReactServiceTest(unittest.IsolatedAsyncioTestCase):
 
         with patch.object(service.upstream, 'chat', new=fake_chat), \
                 patch.object(service.tools, 'execute', new=fake_execute):
-            answer = await service.react('天气？', 39.9, 116.4)
+            answer = await service.react('帮我查询经纬度121.48,31.17的天气')
 
         self.assertEqual(answer, '查询次数已用完。')
         self.assertEqual(len(executed), 3)
@@ -120,7 +121,7 @@ class ReactServiceTest(unittest.IsolatedAsyncioTestCase):
 
         with patch.object(service.upstream, 'chat', new=fake_chat), \
                 patch.object(service.tools, 'execute', new=fake_execute):
-            answer = await service.react('天气？', 39.9, 116.4)
+            answer = await service.react('帮我查询经纬度121.48,31.17的天气')
 
         self.assertEqual(answer, '暂时查不到。')
         self.assertIn('weather upstream unavailable', seen[1][-1]['content'])
@@ -131,20 +132,7 @@ class ReactServiceTest(unittest.IsolatedAsyncioTestCase):
 
         with patch.object(service.upstream, 'chat', new=fake_chat):
             with self.assertRaises(UpstreamUnavailableError):
-                await service.react('天气？', 39.9, 116.4)
-
-
-class ValidateNumberTest(unittest.TestCase):
-
-    def test_rejects_nan(self):
-        with self.assertRaises(ParamError):
-            validate.require_number(
-                {'latitude': float('nan')}, 'latitude', -90, 90
-            )
-
-    def test_rejects_bool(self):
-        with self.assertRaises(ParamError):
-            validate.require_number({'latitude': True}, 'latitude')
+                await service.react('帮我查询经纬度121.48,31.17的天气')
 
 
 class ToolsTest(unittest.IsolatedAsyncioTestCase):

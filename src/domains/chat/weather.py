@@ -7,13 +7,16 @@ from src.domains.chat.errors import UpstreamError
 # 查询天气
 async def fetch_current(lat: float, lon: float) -> dict:
     url = 'https://api.open-meteo.com/v1/forecast'
+
     params = {
         'latitude': lat,
         'longitude': lon,
         'current_weather': 'true',
     }
+
     client = httpx.get_client()
     timeout = Timeout(connect=3.0, read=15.0, write=5.0, pool=5.0)
+
     try:
         resp = await client.get(url, params=params, timeout=timeout)
         resp.raise_for_status()

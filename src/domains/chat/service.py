@@ -43,25 +43,18 @@ async def structured():
         raise UpstreamUnavailableError() from exc
 
 
-MAX_ROUNDS = 3
-MAX_TOOL_CALLS = 3
-
-
-async def react(question: str, latitude: float, longitude: float) -> str:
+async def react(question: str) -> str:
     messages = [
         {'role': 'system', 'content': react_system_prompt},
-        {
-            'role': 'user',
-            'content': (
-                f'问题：{question}\n'
-                f'可用坐标：latitude={latitude}, longitude={longitude}'
-            ),
-        },
+        {'role': 'user', 'content': question},
     ]
     tool_calls_used = 0
 
+    max_rounds = 3
+    max_tool_calls = 3
+
     try:
-        for _ in range(MAX_ROUNDS):
+        for _ in range(1, max_rounds + 1):
             choice = await upstream.chat(
                 messages,
                 tools=tools.weather_tools,
@@ -74,7 +67,7 @@ async def react(question: str, latitude: float, longitude: float) -> str:
             messages.append(message)
 
             for tool_call in message['tool_calls']:
-                if tool_calls_used >= MAX_TOOL_CALLS:
+                if tool_calls_used >= max_tool_calls:
                     result = {'error': 'tool call limit exceeded'}
                 else:
                     result = await tools.execute(tool_call)
@@ -86,7 +79,7 @@ async def react(question: str, latitude: float, longitude: float) -> str:
                     'content': serial.to_json(result),
                 })
 
-            if tool_calls_used >= MAX_TOOL_CALLS:
+            if tool_calls_used >= max_tool_calls:
                 break
 
         messages.append({

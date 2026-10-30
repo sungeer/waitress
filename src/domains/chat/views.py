@@ -31,8 +31,6 @@ async def react(request):
     data = await validate.require_body(request)
 
     question = validate.require_str(data, 'question')
-    latitude = validate.require_number(data, 'latitude', -90, 90)
-    longitude = validate.require_number(data, 'longitude', -180, 180)
 
-    answer = await service.react(question, latitude, longitude)
+    answer = await service.react(question)
     return ok({'answer': answer})
