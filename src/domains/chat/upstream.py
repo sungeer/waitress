@@ -66,6 +66,14 @@ async def complete() -> str:
         )
         raise UpstreamError('choice type is incorrect')
 
+    finish_reason = choice.get('finish_reason')
+    if finish_reason != 'stop':
+        logger.error(
+            'llm response finish_reason is not stop, finish_reason={}',
+            finish_reason
+        )
+        raise UpstreamError('finish_reason is not stop')
+
     message = choice.get('message')
     if not isinstance(message, dict):
         logger.error(
@@ -81,6 +89,13 @@ async def complete() -> str:
             type(content).__name__, content
         )
         raise UpstreamError('content type is incorrect')
+
+    if not content:
+        logger.error(
+            'llm response content is empty, finish_reason={}',
+            finish_reason
+        )
+        raise UpstreamError('content is empty')
     return content
 
 
@@ -105,6 +120,7 @@ async def structured():
             {'role': 'system', 'content': structured_system_prompt},
             {'role': 'user', 'content': user_msg}
         ],
+        'max_tokens': 1024,  # 防止 JSON 字符串被中途截断
         'stream': False,
         'thinking': {'type': 'enabled'},
         'reasoning_effort': 'low',
@@ -152,6 +168,14 @@ async def structured():
         )
         raise UpstreamError('choice type is incorrect')
 
+    finish_reason = choice.get('finish_reason')
+    if finish_reason != 'stop':
+        logger.error(
+            'llm response finish_reason is not stop, finish_reason={}, max_tokens={}',
+            finish_reason, payload['max_tokens']
+        )
+        raise UpstreamError('finish_reason is not stop')
+
     message = choice.get('message')
     if not isinstance(message, dict):
         logger.error(
@@ -167,6 +191,13 @@ async def structured():
             type(content).__name__, content
         )
         raise UpstreamError('content type is incorrect')
+
+    if not content:
+        logger.error(
+            'llm response content is empty, finish_reason={}',
+            finish_reason
+        )
+        raise UpstreamError('content is empty')
 
     try:
         parsed = serial.from_json(content)
