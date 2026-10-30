@@ -1,0 +1,49 @@
+{
+  "id": "a4080b14-f0e3-4f95-bd3c-c2f95aa73643",
+  "object": "chat.completion",
+  "created": 1793341155,
+  "model": "deepseek-flash",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": {
+          "customer_name": "张三",
+          "phone": "13800138000",
+          "items": [
+            {
+              "product_name": "iPhone 15 Pro Max",
+              "quantity": 2,
+              "unit_price": 8999.0
+            },
+            {
+              "product_name": "AirPods Pro",
+              "quantity": 1,
+              "unit_price": 1899.0
+            }
+          ],
+          "total_amount": 19897.0,
+          "is_urgent": true
+        },
+        "reasoning_content": "We need answer only JSON. Need compute total: 2*8999=17998, +1899=19897 yes. urgent true. customer 张三 phone. Output strict JSON."
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 622,
+    "completion_tokens": 113,
+    "total_tokens": 735,
+    "prompt_tokens_details": {
+      "cached_tokens": 256
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 39
+    },
+    "prompt_cache_hit_tokens": 256,
+    "prompt_cache_miss_tokens": 366
+  },
+  "system_fingerprint": "bc19ba97cbe016479903222bb1578db6"
+}
