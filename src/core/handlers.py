@@ -12,37 +12,36 @@ from src.core.response import fail
 # 业务失败
 async def business_error(request, exc):
     logger.warning(
-        'business error method={} path={} code={} msg={}',
-        request.method, request.url.path, exc.code, exc.msg,
+        'business error, method={}, path={}, msg={}',
+        request.method, request.url.path, exc.msg,
     )
-    # 前端通过 code 判断
-    return fail(exc.code, exc.msg, exc.data)
+    # 前端通过 HTTP 状态 + success 判断
+    return fail(exc.msg)
 
 
 # 未登录
 async def unauthorized_error(request, exc):
-    # return fail(exc.code, exc.msg, None, http_status=exc.http_status)
-    return fail(401, exc.msg, None, http_status=401)
+    return fail(exc.msg, http_status=401)
 
 
 # 无权限 403
 async def forbidden_error(request, exc):
-    return fail(403, exc.msg, None, http_status=403)
+    return fail(exc.msg, http_status=403)
 
 
 # 路由匹配不到
 async def not_found(request, exc):
-    return fail(404, exc.detail, None, http_status=404)
+    return fail(exc.detail, http_status=404)
 
 
 # 方法不对
 async def method_not_allowed(request, exc):
-    return fail(405, exc.detail, None, http_status=405)
+    return fail(exc.detail, http_status=405)
 
 
 # 客户端中途断开
 async def client_disconnect(request, exc):
-    return fail(499, 'client closed request', None, http_status=499)
+    return fail('client closed request', http_status=499)
 
 
 # 内部错误 500
@@ -57,8 +56,7 @@ async def server_error(request, exc):
         logger.exception('unhandled server error path={}', request.url.path)
 
     return fail(
-        500, 'internal server error',
-        None,
+        'internal server error',
         http_status=500,
         headers={'X-Request-ID': request_id}
     )

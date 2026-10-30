@@ -4,7 +4,6 @@ import random
 from src.domains.chat import upstream
 from src.domains.chat.errors import UpstreamError
 from src.utils import serial
-from src.utils.codes import BizCode
 from src.utils.exceptions import BusinessError
 
 
@@ -32,11 +31,11 @@ async def ask() -> str:
     try:
         return await upstream.complete()
     except UpstreamError as exc:
-        raise BusinessError(BizCode.UPSTREAM_UNAVAILABLE) from exc
+        raise BusinessError('upstream data source unavailable') from exc
 
 
 async def structured():
     try:
         return await upstream.structured()
     except UpstreamError as exc:
-        raise BusinessError(BizCode.UPSTREAM_UNAVAILABLE) from exc
+        raise BusinessError('upstream data source unavailable') from exc

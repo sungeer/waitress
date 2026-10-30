@@ -8,7 +8,6 @@ from src.core.db_registry import db
 from src.core.executor import executor
 from src.domains.weather import repository, upstream
 from src.domains.weather.errors import UpstreamError
-from src.utils.codes import BizCode
 from src.utils.concurrency import run_in_threadpool
 from src.utils.exceptions import BusinessError
 
@@ -174,4 +173,4 @@ async def get_or_refresh(cell: str, lat: float, lon: float) -> dict:
     try:
         return await refresh_cell(cell, lat, lon)
     except UpstreamError as exc:
-        raise BusinessError(BizCode.UPSTREAM_UNAVAILABLE) from exc
+        raise BusinessError('upstream data source unavailable') from exc

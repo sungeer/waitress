@@ -52,4 +52,4 @@ class JWTAuthBackend(AuthenticationBackend):
 
 
 def on_auth_error(request, exc):
-    return fail(401, str(exc), None, http_status=401)
+    return fail(str(exc), http_status=401)
