@@ -2,6 +2,7 @@ from starlette.responses import StreamingResponse
 
 from src.core.response import ok
 from src.domains.chat import service
+from src.utils import validate
 
 
 async def stream(request):  # noqa
@@ -15,7 +16,8 @@ async def stream(request):  # noqa
     )
 
 
-async def ask(request):  # noqa
+async def ask(request):
+    body: dict = await validate.require_body(request)
     content = await service.ask()
     return ok(content)
 
