@@ -4,6 +4,7 @@ from src import settings
 from src.core.http_client import httpx, HTTPError
 from src.domains.chat.errors import UpstreamError
 from src.domains.chat.prompts import structured_system_prompt
+from src.domains.chat import schemas, validate
 from src.utils import serial
 
 
@@ -204,4 +205,7 @@ async def structured():
     except ValueError:
         logger.exception('json decode error, content={}', content)
         raise UpstreamError('json decode error')
+
+    structured_schema = schemas.structured_schema
+    validate.validated_struct(parsed, structured_schema)
     return parsed
