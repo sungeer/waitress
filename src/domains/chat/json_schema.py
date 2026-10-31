@@ -29,6 +29,25 @@ structured_schema = {
 }
 
 
+weather_schema = {
+    'type': 'object',
+    'properties': {
+        'latitude': {
+            'type': 'number',
+            'minimum': -90,
+            'maximum': 90
+        },
+        'longitude': {
+            'type': 'number',
+            'minimum': -180,
+            'maximum': 180
+        },
+    },
+    'required': ['latitude', 'longitude'],
+    'additionalProperties': False,
+}
+
+
 def validate_struct(raw, schema):
     try:
         validate(raw, schema)

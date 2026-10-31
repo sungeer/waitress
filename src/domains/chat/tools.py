@@ -1,6 +1,7 @@
 from jsonschema import validate, ValidationError
 from loguru import logger
 
+from src.domains.chat import json_schema
 from src.domains.chat import weather
 from src.domains.chat.errors import UpstreamError
 from src.utils import serial
@@ -16,15 +17,11 @@ weather_tool = {
             'properties': {
                 'latitude': {
                     'type': 'number',
-                    'minimum': -90,
-                    'maximum': 90,
-                    'description': '纬度',
+                    'description': '纬度，必须在 -90 到 90 之间',
                 },
                 'longitude': {
                     'type': 'number',
-                    'minimum': -180,
-                    'maximum': 180,
-                    'description': '经度',
+                    'description': '经度，必须在 -180 到 180 之间',
                 },
             },
             'required': ['latitude', 'longitude'],
@@ -34,7 +31,6 @@ weather_tool = {
 }
 
 weather_tools = [weather_tool]
-weather_parameters = weather_tool['function']['parameters']
 
 
 async def execute(tool_call: dict) -> dict:
@@ -67,7 +63,7 @@ async def execute(tool_call: dict) -> dict:
         return {'error': 'arguments must be a JSON object'}
 
     try:
-        validate(args, weather_parameters)
+        validate(args, json_schema.weather_schema)
     except ValidationError as exc:
         logger.warning(
             'tool arguments validation failed, name={}, args={}, msg={}',
