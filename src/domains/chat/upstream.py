@@ -38,7 +38,7 @@ async def complete() -> str:
         )
         raise UpstreamError('llm request failed')
 
-    logger.info('llm response data={}', data)
+    logger.debug('llm response data={}', data)
 
     if not isinstance(data, dict):
         logger.error(
@@ -140,7 +140,7 @@ async def structured():
         )
         raise UpstreamError('llm request failed')
 
-    logger.info('llm response data={}', data)
+    logger.debug('llm response data={}', data)
 
     if not isinstance(data, dict):
         logger.error(
@@ -279,7 +279,7 @@ async def chat(messages, tools=None, tool_choice=None):
         )
         raise UpstreamError('llm request failed')
 
-    logger.info('llm response data={}', data)
+    logger.debug('llm response data={}', data)
 
     if not isinstance(data, dict):
         logger.error(

@@ -30,7 +30,9 @@ def setup_logger():
         '{message} ({name}:{line})'
     )
 
-    if settings.ENVIRONMENT == 'development':
+    env = settings.ENVIRONMENT
+
+    if env == 'development':
         logger.add(
             sys.stdout,
             format=fmt,
@@ -38,7 +40,7 @@ def setup_logger():
             backtrace=False,
             colorize=False,
             enqueue=False,
-            level='INFO',
+            level='DEBUG',
         )
 
     log_file = settings.LOG_DIR / 'waitress_{time:YYYY-MM-DD}.log'
