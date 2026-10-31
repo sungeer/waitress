@@ -22,7 +22,7 @@ def chat_react(question: str):
 
 
 def main():
-    data = chat_react('帮我查询经纬度116.39,39.90的天气')
+    data = chat_react('帮我查询经纬度39.9042,116.4074的天气')
     return data
 
 

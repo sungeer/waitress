@@ -15,7 +15,7 @@ async def fetch_current(lat: float, lon: float) -> dict:
     }
 
     client = httpx.get_client()
-    timeout = Timeout(connect=3.0, read=15.0, write=5.0, pool=5.0)
+    timeout = Timeout(connect=15.0, read=15.0, write=15.0, pool=5.0)
 
     try:
         resp = await client.get(url, params=params, timeout=timeout)
