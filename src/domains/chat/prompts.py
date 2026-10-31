@@ -1,6 +1,5 @@
 import textwrap
 
-
 structured_system_prompt = textwrap.dedent('''
     # 角色
     你是订单信息提取助手，负责从用户的自然语言描述中抽取结构化的订单数据。
@@ -64,7 +63,6 @@ structured_system_prompt = textwrap.dedent('''
       "is_urgent": false
     }
 ''').strip()
-
 
 react_system_prompt = textwrap.dedent('''
     # 角色

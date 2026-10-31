@@ -1,6 +1,8 @@
 import asyncio
 import random
 
+from loguru import logger
+
 from src.domains.chat import upstream
 from src.domains.chat import tools
 from src.domains.chat.errors import UpstreamError
@@ -54,24 +56,38 @@ async def react(question: str) -> str:
     max_tool_calls = 3
 
     try:
-        for _ in range(1, max_rounds + 1):
+        for round_no in range(1, max_rounds + 1):
+            logger.info('[round {}] llm call', round_no)
             choice = await upstream.chat(
                 messages,
                 tools=tools.weather_tools,
             )
             message = choice['message']
+            logger.info('[round {}] finish_reason={}', round_no, choice['finish_reason'])
 
             if choice['finish_reason'] == 'stop':
+                logger.info('[round {}] answer directly', round_no)
                 return message['content']
 
             messages.append(message)
 
             for tool_call in message['tool_calls']:
+                function = tool_call['function']
                 if tool_calls_used >= max_tool_calls:
+                    logger.warning(
+                        '[round {}] tool call limit exceeded, skip name={}',
+                        round_no, function['name']
+                    )
                     result = {'error': 'tool call limit exceeded'}
                 else:
+                    logger.info(
+                        '[round {}] tool call name={} args={}',
+                        round_no, function['name'], function['arguments']
+                    )
                     result = await tools.execute(tool_call)
                     tool_calls_used += 1
+
+                logger.info('[round {}] tool result={}', round_no, serial.to_json(result))
 
                 messages.append({
                     'role': 'tool',
@@ -80,12 +96,14 @@ async def react(question: str) -> str:
                 })
 
             if tool_calls_used >= max_tool_calls:
+                logger.warning('[round {}] tool call limit reached, break', round_no)
                 break
 
         messages.append({
             'role': 'user',
             'content': '已达到工具调用上限，不要再调用工具，直接基于以上信息用中文回答。',
         })
+        logger.warning('tool call limit or rounds exhausted, force final answer')
         choice = await upstream.chat(
             messages,
             tools=tools.weather_tools,
