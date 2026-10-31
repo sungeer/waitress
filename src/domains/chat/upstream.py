@@ -259,10 +259,8 @@ async def chat(messages, tools=None, tool_choice=None):
     payload = {
         'model': settings.LLM_MODEL,
         'messages': messages,
-        'max_tokens': 1024,
         'stream': False,
-        'thinking': {'type': 'enabled'},
-        'reasoning_effort': 'low',
+        'thinking': {'type': 'disabled'}
     }
     if tools is not None:
         payload['tools'] = tools
