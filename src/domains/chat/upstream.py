@@ -1,3 +1,5 @@
+import time
+
 from loguru import logger
 
 from src import settings
@@ -27,6 +29,7 @@ async def complete() -> str:
     }
 
     client = httpx.get_client()
+    start = time.perf_counter()
     try:
         response = await client.post(url, headers=headers, json=payload)
         response.raise_for_status()
@@ -37,6 +40,9 @@ async def complete() -> str:
             url, payload
         )
         raise UpstreamError('llm request failed')
+
+    elapsed = time.perf_counter() - start
+    logger.info("api request took {:.2f} seconds", elapsed)
 
     logger.debug('llm response data={}', data)
 

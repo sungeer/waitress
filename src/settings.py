@@ -4,7 +4,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy.engine import URL
 
-VERSION = '26.1103.1932'
+VERSION = '26.1104.0848'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
