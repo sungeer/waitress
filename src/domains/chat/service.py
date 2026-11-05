@@ -5,6 +5,9 @@ from loguru import logger
 
 from src.domains.chat import upstream
 from src.domains.chat import tools
+from src.domains.chat.budget import MAX_ROUNDS
+from src.domains.chat.budget import MAX_TOOL_CALLS
+from src.domains.chat.errors import ReactLoopExhaustedError
 from src.domains.chat.errors import UpstreamError
 from src.domains.chat.prompts import react_system_prompt
 from src.utils import serial
@@ -52,28 +55,27 @@ async def react(question: str) -> str:
     ]
     tool_calls_used = 0
 
-    max_rounds = 3
-    max_tool_calls = 3
-
     try:
-        for round_no in range(1, max_rounds + 1):
+        for round_no in range(1, MAX_ROUNDS + 1):
             logger.info('[round {}] llm call', round_no)
-            choice = await upstream.chat(
+            finish_reason, message = await upstream.chat(
                 messages,
                 tools=tools.weather_tools,
             )
-            message = choice['message']
-            logger.info('[round {}] finish_reason={}', round_no, choice['finish_reason'])
+            logger.info('[round {}] finish_reason={}', round_no, finish_reason)
 
-            if choice['finish_reason'] == 'stop':
-                logger.info('[round {}] answer directly', round_no)
+            if finish_reason == upstream.FINISH_REASON_STOP:
                 return message['content']
 
-            messages.append(message)
+            messages.append({
+                'role': 'assistant',
+                'content': message.get('content'),
+                'tool_calls': message['tool_calls'],
+            })
 
             for tool_call in message['tool_calls']:
                 function = tool_call['function']
-                if tool_calls_used >= max_tool_calls:
+                if tool_calls_used >= MAX_TOOL_CALLS:
                     logger.warning(
                         '[round {}] tool call limit exceeded, skip name={}',
                         round_no, function['name']
@@ -95,20 +97,15 @@ async def react(question: str) -> str:
                     'content': serial.to_json(result),
                 })
 
-            if tool_calls_used >= max_tool_calls:
-                logger.warning('[round {}] tool call limit reached, break', round_no)
+            if tool_calls_used >= MAX_TOOL_CALLS:
                 break
-
-        messages.append({
-            'role': 'user',
-            'content': '已达到工具调用上限，不要再调用工具，直接基于以上信息用中文回答。',
-        })
-        logger.warning('tool call limit or rounds exhausted, force final answer')
-        choice = await upstream.chat(
-            messages,
-            tools=tools.weather_tools,
-            tool_choice='none',
-        )
-        return choice['message']['content']
     except UpstreamError as exc:
         raise UpstreamUnavailableError() from exc
+
+    logger.error(
+        'react loop exhausted, rounds={} tool_calls={}',
+        round_no, tool_calls_used
+    )
+    raise ReactLoopExhaustedError(
+        f'rounds={round_no} tool_calls={tool_calls_used}'
+    )

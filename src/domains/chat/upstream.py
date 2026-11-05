@@ -10,6 +10,10 @@ from src.domains.chat import json_schema
 from src.utils import serial
 
 
+FINISH_REASON_STOP = 'stop'
+FINISH_REASON_TOOL_CALLS = 'tool_calls'
+
+
 async def complete() -> str:
     url = 'https://api.deepseek.com/chat/completions'
 
@@ -254,7 +258,7 @@ def _validate_tool_call(tool_call):
         raise UpstreamError('tool_call arguments is incorrect')
 
 
-async def chat(messages, tools=None, tool_choice=None):
+async def chat(messages, tools=None):
     url = 'https://api.deepseek.com/chat/completions'
 
     headers = {
@@ -270,8 +274,6 @@ async def chat(messages, tools=None, tool_choice=None):
     }
     if tools is not None:
         payload['tools'] = tools
-    if tool_choice is not None:
-        payload['tool_choice'] = tool_choice
 
     client = httpx.get_client()
     try:
@@ -315,7 +317,7 @@ async def chat(messages, tools=None, tool_choice=None):
         raise UpstreamError('choice type is incorrect')
 
     finish_reason = choice.get('finish_reason')
-    if finish_reason not in ('stop', 'tool_calls'):
+    if finish_reason not in (FINISH_REASON_STOP, FINISH_REASON_TOOL_CALLS):
         logger.error(
             'llm response finish_reason is unsupported, finish_reason={}',
             finish_reason
@@ -330,7 +332,7 @@ async def chat(messages, tools=None, tool_choice=None):
         )
         raise UpstreamError('message type is incorrect')
 
-    if finish_reason == 'stop':
+    if finish_reason == FINISH_REASON_STOP:
         content = message.get('content')
         if not isinstance(content, str):
             logger.error(
@@ -355,4 +357,4 @@ async def chat(messages, tools=None, tool_choice=None):
         for tool_call in tool_calls:
             _validate_tool_call(tool_call)
 
-    return choice
+    return finish_reason, message

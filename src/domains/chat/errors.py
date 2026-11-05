@@ -4,3 +4,11 @@ class UpstreamError(Exception):
     域内控制流专用
     """
     pass
+
+
+class ReactLoopExhaustedError(Exception):
+    """ReAct 循环未在预算内收敛
+    属于逻辑异常 不是上游故障
+    故意不继承 UpstreamError 避免被映射成 503
+    """
+    pass
