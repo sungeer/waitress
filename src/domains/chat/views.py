@@ -17,7 +17,7 @@ async def stream(request):  # noqa
 
 
 async def ask(request):
-    body: dict = await validate.require_body(request)
+    body: dict = await validate.require_body(request)  # noqa
     content = await service.ask()
     return ok(content)
 
@@ -25,12 +25,3 @@ async def ask(request):
 async def structured(request):  # noqa
     content = await service.structured()
     return ok(content)
-
-
-async def react(request):
-    data = await validate.require_body(request)
-
-    question = validate.require_str(data, 'question')
-
-    answer = await service.react(question)
-    return ok({'answer': answer})
